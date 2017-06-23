@@ -1646,8 +1646,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-LLVM_SRC_ROOT="/home/roselone/coding/thuos/llvm-2.9/"
-LLVM_OBJ_ROOT="/home/roselone/coding/thuos/opt/llvm"
+LLVM_SRC_ROOT="/home/mujin/mujin/jhbuildapppickworker/checkoutroot/llvm-2.9"
+LLVM_OBJ_ROOT="/home/mujin/mujin/jhbuildapppickworker/docker/build/llvm-2.9"
 
 LLVM_ABS_SRC_ROOT="`cd $srcdir ; cd $LLVM_SRC_ROOT ; pwd`"
 LLVM_ABS_OBJ_ROOT="`cd $LLVM_OBJ_ROOT ; pwd`"
