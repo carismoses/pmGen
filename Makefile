@@ -55,7 +55,7 @@ CXXFLAGS := -fno-rtti -O0 -g
 PLUGIN_CXXFLAGS := -fpic
 
 LLVM_CXXFLAGS := `$(LLVM_BIN_PATH)/llvm-config --cxxflags`
-# may need to add this if not finding llvm headers?: --includedir
+# may need to add --includedirs to this?
 LLVM_LDFLAGS := `$(LLVM_BIN_PATH)/llvm-config --ldflags --libs --system-libs`
 
 # Plugins shouldn't link LLVM and Clang libs statically, because they are
@@ -120,8 +120,7 @@ PMGEN_INCDIRS = -I $(INCLUDE_DIR)
 all: make_builddir \
 	make_bindir \
 	emit_build_config \
-	$(BUILD_DIR)/main.o
-#	$(BIN_DIR)/pmGen
+	$(BIN_DIR)/pmGen
 
 # uncomment when make tests
 #.PHONY: test
@@ -148,8 +147,17 @@ emit_build_config: make_builddir
 #$(BIN_DIR)/pmGen: $(BIN_DIR)/helper.a $(BIN_DIR)/io.a $(BIN_DIR)/test.a $(BUILD_DIR)/main.o
 #	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
+# making pmGen executable
+$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LLVM_LDFLAGS)  
+
+# compiling main.o
 $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp
-	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $(LLVM_LDFLAGS) -o $@ -c $^
+	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
+
+# compiling IO.o
+$(BUILD_DIR)/IO.o: $(LIB_DIR)/IO/IO.cpp
+	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
 #$(BUILD_DIR)/helper.o: $(LIB_DIR)/Helper/Helper.cpp
 #	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@

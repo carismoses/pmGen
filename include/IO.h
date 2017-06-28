@@ -17,6 +17,6 @@
 
 using namespace llvm;
 
-Module *parseModule(std::string InputFileName,LLVMContext &Context);
+std::unique_ptr< Module > parseModule(std::string InputFileName,LLVMContext &Context);
 
 #endif

@@ -1,16 +1,22 @@
 #include "test.h"
 #include "IO.h"
 //#include "TypeFinder.h"
-#include "Helper.h"
-#include "SlotTracker.h"
-#include "FunctionGen.h"
+//#include "Helper.h"
+//#include "SlotTracker.h"
+//#include "FunctionGen.h"
 
 //OLD#include "llvm/Support/FormattedStream.h"
 
-//#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/IR/Module.h"
+#include "llvm/AsmParser/Parser.h"
+#include "llvm/IR/LLVMContext.h"
 
 //OLD#include "llvm/Assembly/Writer.h"
 //OLD#include "llvm/TypeSymbolTable.h"
+
+// this is just for testing
+#include <iostream>
 
 using namespace llvm;
 
@@ -30,7 +36,8 @@ int main (int argc, char ** argv)
 		exit(1);
 	}
 
-	Module *m=parseModule(InputFileName,Context);
+	std::unique_ptr<Module> m=parseModule(InputFileName,Context);
+    //std::cout << "working to this point" << "\n"; ****************** not printing for some reason! ********************
 //	outs()<<*m<<"\n-----------------------\n\n";
 /*
 	Module::global_iterator begin=m->global_begin();

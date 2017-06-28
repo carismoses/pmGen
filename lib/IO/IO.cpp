@@ -1,11 +1,13 @@
 #include "IO.h"
 #include "llvm/Support/SourceMgr.h"
-#include "llvm/Support/IRReader.h"
+//OLD#include "llvm/Support/IRReader.h"
+#include "llvm/IRReader/IRReader.h"
+
 using namespace std;
 
-Module *parseModule(std::string InputFileName,LLVMContext &Context){
+std::unique_ptr< Module > parseModule(std::string InputFileName,LLVMContext &Context){
 	SMDiagnostic Err;
-	Module *m=ParseIRFile(InputFileName,Err,Context);
+	std::unique_ptr< Module > m=parseIRFile(InputFileName,Err,Context);
 	return m;
 }
 
