@@ -2,11 +2,11 @@
 #define PMG_TYPEFINDER_H
 
 #include "TypeGen.h"
-#include "llvm/Assembly/Writer.h"
-#include "llvm/Module.h"
-#include "llvm/DerivedTypes.h"
-#include "llvm/ADT/DenseSet.h"
-#include "llvm/Support/ErrorHandling.h"
+//#include "llvm/Assembly/Writer.h"
+//#include "llvm/Module.h"
+//#include "llvm/DerivedTypes.h"
+//#include "llvm/ADT/DenseSet.h"
+//#include "llvm/Support/ErrorHandling.h"
 
 namespace llvm {
 

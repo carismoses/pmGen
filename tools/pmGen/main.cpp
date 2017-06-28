@@ -1,13 +1,16 @@
 #include "test.h"
 #include "IO.h"
-#include "TypeFinder.h"
+//#include "TypeFinder.h"
 #include "Helper.h"
 #include "SlotTracker.h"
 #include "FunctionGen.h"
 
-#include "llvm/Support/FormattedStream.h"
-#include "llvm/Assembly/Writer.h"
-#include "llvm/TypeSymbolTable.h"
+//OLD#include "llvm/Support/FormattedStream.h"
+
+//#include "llvm/Support/raw_ostream.h"
+
+//OLD#include "llvm/Assembly/Writer.h"
+//OLD#include "llvm/TypeSymbolTable.h"
 
 using namespace llvm;
 
@@ -29,7 +32,7 @@ int main (int argc, char ** argv)
 
 	Module *m=parseModule(InputFileName,Context);
 //	outs()<<*m<<"\n-----------------------\n\n";
-
+/*
 	Module::global_iterator begin=m->global_begin();
 	Module::global_iterator end=m->global_end();
 	TypeGen TypeGener;
@@ -65,6 +68,7 @@ int main (int argc, char ** argv)
 	}
 	Helper::InitBE(initProc,false);
 	outs()<<initProc.str();
+*/
 	return 0;
 }
 

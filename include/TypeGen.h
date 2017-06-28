@@ -1,7 +1,7 @@
 #ifndef PMG_TYPEGEN_H
 #define PMG_TYPEGEN_H
 
-#include "llvm/TypeSymbolTable.h"
+//#include "llvm/TypeSymbolTable.h"
 
 #include <string>
 #include <vector>

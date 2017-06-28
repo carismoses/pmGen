@@ -54,7 +54,8 @@ CXX := g++
 CXXFLAGS := -fno-rtti -O0 -g
 PLUGIN_CXXFLAGS := -fpic
 
-LLVM_CXXFLAGS := `$(LLVM_BIN_PATH)/llvm-config --cxxflags --includedir`
+LLVM_CXXFLAGS := `$(LLVM_BIN_PATH)/llvm-config --cxxflags`
+# may need to add this if not finding llvm headers?: --includedir
 LLVM_LDFLAGS := `$(LLVM_BIN_PATH)/llvm-config --ldflags --libs --system-libs`
 
 # Plugins shouldn't link LLVM and Clang libs statically, because they are
@@ -103,7 +104,7 @@ CLANG_INCLUDES := \
 
 # Internal paths in this project: where to find sources, and where to put
 # build artifacts.
-PMGEN_ROOT := /home/mujin/mujin/jhbuildapppickworker/checkoutroot/pmGen
+#PMGEN_ROOT := /home/mujin/mujin/jhbuildapppickworker/checkoutroot/pmGen
 
 #would like to change to src
 SRC_DIR := tools/pmGen
@@ -112,12 +113,15 @@ BUILD_DIR := build
 BIN_DIR := bin
 INCLUDE_DIR := include
 
-PMGEN_FLAGS = -I $(INCLUDE_DIR) -I $(LLVM_SRC_PATH)/include
+PMGEN_INCDIRS = -I $(INCLUDE_DIR)
+#-I $(LLVM_SRC_PATH)/include
 
 .PHONY: all
 all: make_builddir \
+	make_bindir \
 	emit_build_config \
-	$(BIN_DIR)/pmGen
+	$(BUILD_DIR)/main.o
+#	$(BIN_DIR)/pmGen
 
 # uncomment when make tests
 #.PHONY: test
@@ -133,33 +137,37 @@ all: make_builddir \
 make_builddir:
 	@test -d $(BUILD_DIR) || mkdir $(BUILD_DIR)
 
+.PHONY: make_bindir
+make_bindir:
+	@test -d $(BIN_DIR) || mkdir $(BIN_DIR)
+
 .PHONY: emit_build_config
 emit_build_config: make_builddir
 	@echo $(LLVM_BIN_PATH) > $(BUILD_DIR)/_build_config
 
-$(BIN_DIR)/pmGen: $(BIN_DIR)/helper.a $(BIN_DIR)/io.a $(BIN_DIR)/test.a $(BUILD_DIR)/main.o
-	$(CXX) $(PMGEN_FLAGS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+#$(BIN_DIR)/pmGen: $(BIN_DIR)/helper.a $(BIN_DIR)/io.a $(BIN_DIR)/test.a $(BUILD_DIR)/main.o
+#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
 $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp
-	$(CXX) $(PMGEN_FLAGS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $(LLVM_LDFLAGS) -o $@ -c $^
 
-$(BUILD_DIR)/helper.o: $(LIB_DIR)/Helper/Helper.cpp
-	$(CXX) $(PMGEN_FLAGS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+#$(BUILD_DIR)/helper.o: $(LIB_DIR)/Helper/Helper.cpp
+#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
-$(BUILD_DIR)/io.o: $(LIB_DIR)/IO/IO.cpp
-	$(CXX) $(PMGEN_FLAGS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+#$(BUILD_DIR)/io.o: $(LIB_DIR)/IO/IO.cpp
+#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
-$(BUILD_DIR)/test.o: $(LIB_DIR)/test/test.c
-	$(CXX) $(PMGEN_FLAGS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+#$(BUILD_DIR)/test.o: $(LIB_DIR)/test/test.c
+#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
-$(BIN_DIR)/helper.a: $(BUILD_DIR)/helper.o
-	$(CXX) $(PMGEN_FLAGS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+#$(BIN_DIR)/helper.a: $(BUILD_DIR)/helper.o
+#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
-$(BIN_DIR)/io.a: $(BUILD_DIR)/io.o
-	$(CXX) $(PMGEN_FLAGS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+#$(BIN_DIR)/io.a: $(BUILD_DIR)/io.o
+#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
-$(BIN_DIR)/test.a: $(BUILD_DIR)/test.o
-	$(CXX) $(PMGEN_FLAGS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+#$(BIN_DIR)/test.a: $(BUILD_DIR)/test.o
+#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
 .PHONY: clean format
 

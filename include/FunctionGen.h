@@ -1,7 +1,7 @@
 #ifndef PMG_FUNCTIONGEN_H
 #define PMG_FUNCTIONGEN_H
 
-#include "llvm/Attributes.h"
+#include "llvm/IR/Attributes.h"
 #include <map>
 
 namespace llvm {
@@ -30,13 +30,13 @@ public:
 	FunctionGen(TypeGen &TG,SlotTracker &ST,formatted_raw_ostream &OS,const Module *M):TypeGener(TG),Machine(ST),Out(OS),TheModule(M){}
 	~FunctionGen(){}
 	void printFunction(const Function *F);
-	void printArgument(const Argument *Arg,Attributes Attrs);
+	void printArgument(const Argument *Arg,AttributeSet Attrs);
 	void printBasicBlock(const BasicBlock *BB);
 	void printInstruction(const Instruction &I);
 private:
 	void localValueDeclare(const Instruction &I);
 	void writeOperand(const Value *Operand,bool PrintType);
-	void writeParamOperand(const Value *Operand,Attributes Attrs);
+	void writeParamOperand(const Value *Operand,AttributeSet Attrs);
 };
 
 }
