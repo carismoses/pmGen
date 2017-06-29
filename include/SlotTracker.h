@@ -39,7 +39,8 @@ private:
   unsigned mdnNext;
 public:
   /// Construct from a module
-    explicit SlotTracker(const Module &M) {TheModule = &M;}
+    explicit SlotTracker(const Module &M)
+        : TheModule(&M) {}
   /// Construct from a function, starting out in incorp state.
   explicit SlotTracker(const Function *F);
 
