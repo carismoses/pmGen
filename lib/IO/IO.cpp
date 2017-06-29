@@ -5,9 +5,9 @@
 
 using namespace std;
 
-std::unique_ptr< Module > parseModule(std::string InputFileName,LLVMContext &Context){
+std::unique_ptr<Module> parseModule(std::string InputFileName,LLVMContext &Context){
 	SMDiagnostic Err;
-	std::unique_ptr< Module > m=parseIRFile(InputFileName,Err,Context);
+	std::unique_ptr<Module> m=parseIRFile(InputFileName,Err,Context);
 	return m;
 }
 

@@ -148,7 +148,7 @@ emit_build_config: make_builddir
 #	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
 # making pmGen executable
-$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o
+$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o $(BUILD_DIR)/Helper.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LLVM_LDFLAGS)  
 
 # compiling main.o
@@ -158,6 +158,9 @@ $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp
 # compiling IO.o
 $(BUILD_DIR)/IO.o: $(LIB_DIR)/IO/IO.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
+
+$(BUILD_DIR)/Helper.o: $(LIB_DIR)/Helper/TypeGen.cpp
+	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
 #$(BUILD_DIR)/helper.o: $(LIB_DIR)/Helper/Helper.cpp
 #	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@

@@ -4,7 +4,8 @@
 
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/STLExtras.h"
-#include "llvm/TypeSymbolTable.h"
+//OLD#include "llvm/TypeSymbolTable.h"
+#include "llvm/IR/ValueSymbolTable.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/FormattedStream.h"
 #include <cctype>
@@ -12,16 +13,23 @@
 using namespace llvm;
 
 void TypeFinder::Run(const Module &M) {
-
 	AddModuleTypesToPrinter(TP,&M);
 
     // Get types from the type symbol table.  This gets opaque types referened
     // only through derived named types.
-    const TypeSymbolTable &ST = M.getTypeSymbolTable();
-    for (TypeSymbolTable::const_iterator TI = ST.begin(), E = ST.end();
+    //const ValueSymbolTable &ST = M.getValueSymbolTable();
+    //for (ValueSymbolTable::const_iterator TI = ST.begin(), E = ST.end();
+    //       TI != E; ++TI)
+	//	IncorporateType(TI->second);
+
+    // change from incorporate type (from TypeSymbolTable) to incporporate value
+    // (from value symbol table)
+    const ValueSymbolTable &ST = M.getValueSymbolTable();
+    for (ValueSymbolTable::const_iterator TI = ST.begin(), E = ST.end();
            TI != E; ++TI)
 		IncorporateType(TI->second);
 
+    
     // Get types from global variables.
 	for (Module::const_global_iterator I = M.global_begin(),
            E = M.global_end(); I != E; ++I) {
@@ -100,8 +108,8 @@ void TypeFinder::AddModuleTypesToPrinter(TypeGen &TP,
 
 	// If the module has a symbol table, take all global types and stuff their
 	// names into the TypeNames map.
-	const TypeSymbolTable &ST = M->getTypeSymbolTable();
-	for (TypeSymbolTable::const_iterator TI = ST.begin(), E = ST.end();
+	const ValueSymbolTable &ST = M->getValueSymbolTable()g;
+	for (ValueSymbolTable::const_iterator TI = ST.begin(), E = ST.end();
        TI != E; ++TI) {
 		const Type *Ty = cast<Type>(TI->second);
 
@@ -304,7 +312,7 @@ void TypeGen::print(const Type *Ty, raw_ostream &OS,
     TM.insert(std::make_pair(Ty, TypeOS.str()));
 }
 
-void TypeGen::gen(std::vector<const Type*> numberedTypes,const TypeSymbolTable &ST,raw_ostream &OS){
+void TypeGen::gen(std::vector<const Type*> numberedTypes,const ValueSymbolTable &ST,raw_ostream &OS){
 	const Type *type;
 	//Emit all numbered types.
 	for (int NI=0,NE=numberedTypes.size();NI!=NE;++NI){
@@ -314,7 +322,7 @@ void TypeGen::gen(std::vector<const Type*> numberedTypes,const TypeSymbolTable &
 	}
 
 	//Print the named types.
-	for (TypeSymbolTable::const_iterator TI=ST.begin(),TE=ST.end();TI!=TE;++TI){
+	for (ValueSymbolTable::const_iterator TI=ST.begin(),TE=ST.end();TI!=TE;++TI){
 		this->printAtLeastOneLevel(TI->second,OS);
 		OS<<'\n';
 	}
