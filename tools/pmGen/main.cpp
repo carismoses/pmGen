@@ -49,7 +49,7 @@ int main (int argc, char ** argv)
 	std::vector<const Type*> numberedTypes;
 	TypeFinder typeFinder(TypeGener,numberedTypes);
 	typeFinder.Run(*m);
-    std::cout << "working to this point" << "\n"; //****************** not printing for some reason! ********************
+    std::cout << "working to this point" << "\n";
     /*
     formatted_raw_ostream OS(outs());
 
