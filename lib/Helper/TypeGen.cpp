@@ -13,7 +13,7 @@
 using namespace llvm;
 
 void TypeFinder::Run(const Module &M) {
-	AddModuleTypesToPrinter(TP,&M);
+	//AddModuleTypesToPrinter(TP,&M);
 
     // Get types from the type symbol table.  This gets opaque types referened
     // only through derived named types.
@@ -23,12 +23,11 @@ void TypeFinder::Run(const Module &M) {
 	//	IncorporateType(TI->second);
 
     // change from incorporate type (from TypeSymbolTable) to incporporate value
-    // (from value symbol table)
+    // (from ValueSymbolTable)
     const ValueSymbolTable &ST = M.getValueSymbolTable();
-    for (ValueSymbolTable::const_iterator TI = ST.begin(), E = ST.end();
-           TI != E; ++TI)
-		IncorporateType(TI->second);
-
+    for (ValueSymbolTable::const_iterator VI = ST.begin(), E = ST.end();
+           VI != E; ++VI)
+		IncorporateValue(VI->second);
     
     // Get types from global variables.
 	for (Module::const_global_iterator I = M.global_begin(),
@@ -46,9 +45,10 @@ void TypeFinder::Run(const Module &M) {
     }
 
     // Get types from functions.
+    // function iterator
     for (Module::const_iterator FI = M.begin(), E = M.end(); FI != E; ++FI) {
         IncorporateType(FI->getType());
-
+        // basic blocks iterator
 		for (Function::const_iterator BB = FI->begin(), E = FI->end();
              BB != E;++BB)
 			for (BasicBlock::const_iterator II = BB->begin(),
@@ -69,8 +69,10 @@ void TypeFinder::IncorporateType(const Type *Ty) {
 		return;
 
     // If this is a structure or opaque type, add a name for the type.
-    if (((Ty->isStructTy() && cast<StructType>(Ty)->getNumElements())
-        || Ty->isOpaqueTy()) && !TP.hasTypeName(Ty)) {
+    // now only struct types can be opaque
+    // changing to just if structure, now only structs can be opaque
+    if (Ty->isStructTy() && cast<StructType>(Ty)->getNumElements()) {
+         //|| Ty->isOpaqueTy()) && !TP.hasTypeName(Ty)) {
 		TP.addTypeName(Ty, "n_"+utostr(unsigned(NumberedTypes.size())));
 		NumberedTypes.push_back(Ty);
     }
@@ -102,17 +104,22 @@ void TypeFinder::IncorporateValue(const Value *V) {
 		IncorporateValue(*I);
 }
 
+/*
 void TypeFinder::AddModuleTypesToPrinter(TypeGen &TP,
                              const Module *M) {
 	if (M == 0) return;
 
 	// If the module has a symbol table, take all global types and stuff their
 	// names into the TypeNames map.
-	const ValueSymbolTable &ST = M->getValueSymbolTable()g;
-	for (ValueSymbolTable::const_iterator TI = ST.begin(), E = ST.end();
-       TI != E; ++TI) {
-		const Type *Ty = cast<Type>(TI->second);
+	const ValueSymbolTable &ST = M->getValueSymbolTable();
+	for (ValueSymbolTable::const_iterator VI = ST.begin(), E = ST.end();
+       VI != E; ++VI) {
 
+        // not sure how this isn't throwing an error.
+        // VI-> should be a value, not a type
+		//const Type *Ty = cast<Type>(VI->second);
+		const Type *Ty = VI->second;
+        
 		// As a heuristic, don't insert pointer to primitive types, because
 		// they are used too often to have a single useful name.
 		if (const PointerType *PTy = dyn_cast<PointerType>(Ty)) {
@@ -135,6 +142,7 @@ void TypeFinder::AddModuleTypesToPrinter(TypeGen &TP,
 		TP.addTypeName(Ty, NameStr);
 	}
 }
+*/
 
 static DenseMap<const Type *, std::string> &getTypeNamesMap(void *M) {
 	return *static_cast<DenseMap<const Type *, std::string>*>(M);
@@ -213,21 +221,21 @@ void TypeGen::CalcTypeName(
 			break;
 		}
 		case Type::FunctionTyID: {
-	const FunctionType *FTy = cast<FunctionType>(Ty);
-    CalcTypeName(FTy->getReturnType(), TypeStack, OS);
-    OS << " (";
-    for (FunctionType::param_iterator I = FTy->param_begin(),
-         E = FTy->param_end(); I != E; ++I) {
-      if (I != FTy->param_begin())
-        OS << ", ";
-      CalcTypeName(*I, TypeStack, OS);
-    }
-    if (FTy->isVarArg()) {
-      if (FTy->getNumParams()) OS << ", ";
-      OS << "...";
-    }
-    OS << ')';
-    break;
+            const FunctionType *FTy = cast<FunctionType>(Ty);
+            CalcTypeName(FTy->getReturnType(), TypeStack, OS);
+            OS << " (";
+            for (FunctionType::param_iterator I = FTy->param_begin(),
+                     E = FTy->param_end(); I != E; ++I) {
+                if (I != FTy->param_begin())
+                    OS << ", ";
+                CalcTypeName(*I, TypeStack, OS);
+            }
+            if (FTy->isVarArg()) {
+                if (FTy->getNumParams()) OS << ", ";
+                OS << "...";
+            }
+            OS << ')';
+            break;
   }
 		case Type::StructTyID: {
 			const StructType *STy = cast<StructType>(Ty);
@@ -241,7 +249,7 @@ void TypeGen::CalcTypeName(
 				CalcTypeName(*I, TypeStack, OS);
 				OS << " u"<<i;
 				i++;
-				if (llvm::next(I) == STy->element_end())
+				if (++I == STy->element_end())
 				OS << ' ';
 				else
 				OS << ';';
@@ -271,13 +279,16 @@ void TypeGen::CalcTypeName(
     OS << '>';
     break;
   }
-  case Type::OpaqueTyID:
-    OS << "opaque";
-    break;
+      // no longer a type
+      // case Type::OpaqueTyID:
+      // OS << "opaque";
+      // break;
   default:
     OS << "<unrecognized-type>";
     break;
   }
+
+    
 
   TypeStack.pop_back();       // Remove self from stack.
 }
@@ -322,8 +333,9 @@ void TypeGen::gen(std::vector<const Type*> numberedTypes,const ValueSymbolTable 
 	}
 
 	//Print the named types.
-	for (ValueSymbolTable::const_iterator TI=ST.begin(),TE=ST.end();TI!=TE;++TI){
-		this->printAtLeastOneLevel(TI->second,OS);
-		OS<<'\n';
-	}
+    // NEED TO FIX, now that values are returned, not types
+	// for (ValueSymbolTable::const_iterator TI=ST.begin(),TE=ST.end();TI!=TE;++TI){
+	// 	this->printAtLeastOneLevel(TI->second,OS);
+	// 	OS<<'\n';
+	// }
 }
