@@ -160,7 +160,7 @@ $(BUILD_DIR)/IO.o: $(LIB_DIR)/IO/IO.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
 $(BUILD_DIR)/Helper.o: $(LIB_DIR)/Helper/TypeGen.cpp
-	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@ $^
+	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
 #$(BUILD_DIR)/helper.o: $(LIB_DIR)/Helper/Helper.cpp
 #	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
