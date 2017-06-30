@@ -32,7 +32,7 @@ class ConStr {
 public:
 	ConStr(){conStr.empty();}	
 	static ConStr *pConStr;
-	bool isConStr(const GlobalVariable *V);
+	bool isConStr(const GlobalVariable &V);
 	bool isExist(const StringRef name);
 	std::string getString(const StringRef name);
 	ConStr *get();

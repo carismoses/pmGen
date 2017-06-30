@@ -698,10 +698,10 @@ void Helper::Formatting(std::string &s){
 	for (i=st;i<=ed;i++) s[j++]=tmp[i];
 	return ;
 }
+caris */
 
 ConStr *ConStr::pConStr=new ConStr();
-
-bool ConStr::isConStr(const GlobalVariable *V){
+bool ConStr::isConStr(const GlobalVariable &V){
 	if (V->hasInitializer()){
 		const ConstantArray *CA=dyn_cast<ConstantArray>(V->getInitializer());
 		if (CA && CA->isString()){
@@ -712,6 +712,7 @@ bool ConStr::isConStr(const GlobalVariable *V){
 	return false;
 }
 
+/* caris
 bool ConStr::isExist(const StringRef name){
 	if (get()->conStr.find(name)!=get()->conStr.end()) return true;
 	else return false;
