@@ -46,7 +46,7 @@ public:
 
   /// Return the slot number of the specified value in it's type
   /// plane.  If something is not in the SlotTracker, return -1.
-  int getLocalSlot(const Value *V);
+  int getLocalSlot(const GlobalVariable *GV);
   int getGlobalSlot(const GlobalValue *V);
   int getMetadataSlot(const MDNode *N);
 

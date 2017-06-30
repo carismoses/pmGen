@@ -63,9 +63,9 @@ int main (int argc, char ** argv)
         // don't want string constant global variables?
         if (!conStr.isConStr(*GI)){
             GVTmp.clear();
-			// TypeGener.print(GI->getType()->getElementType(),gvTmp);
-			// gvTmp<<' ';	
-			// Helper::WriteAsOperandInternal(gvTmp,GI,&TypeGener,&SlotTable,GI->getParent());
+			TypeGener.print(GI->getType()->getElementType(),gvTmp);
+			gvTmp<<' ';	
+			Helper::WriteAsOperandInternal(gvTmp,*GI,&TypeGener,&SlotTable,GI->getParent());
 			// gvTmp<<";\n";
 			// gvTmp.flush();
 			// Helper::Formatting(GVTmp);

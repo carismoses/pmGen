@@ -6,9 +6,9 @@
 
 //OLD#include "llvm/Assembly/Writer.h"
 //OLD#include "llvm/Module.h"
-//OLD#include "llvm/DerivedTypes.h"
+#include "llvm/IR/DerivedTypes.h"
 //OLD#include "llvm/IntrinsicInst.h"
-//OLD#include "llvm/InlineAsm.h"
+#include "llvm/IR/InlineAsm.h"
 #include "llvm/IR/Operator.h"
 //OLD#include "llvm/ADT/SmallString.h"
 //OLD#include "llvm/ADT/DenseSet.h"
@@ -19,6 +19,7 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Constants.h"
+#include "llvm/IR/Constant.h"
 
 using namespace llvm;
 
@@ -86,16 +87,17 @@ void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 //	OS << '"';
 /* caris comment
 }
+end caris comment */
 
 /// PrintLLVMName - Turn the specified name into an 'LLVM name', which is either
 /// prefixed with % (if the string only contains simple characters) or is
 /// surrounded with ""'s (if it has special chars in it).  Print it out.
-void Helper::PrintLLVMName(raw_ostream &OS, const Value *V) {
-	PrintLLVMName(OS, V->getName(),
-                isa<GlobalValue>(V) ? GlobalPrefix : LocalPrefix);
+void Helper::PrintLLVMName(raw_ostream &OS, const GlobalVariable &GV) {
+	PrintLLVMName(OS, GV.getName(),
+                isa<GlobalValue>(GV) ? GlobalPrefix : LocalPrefix);
 }
 
-
+/* caris
 const Module *Helper::getModuleFromVal(const Value *V) {
   if (const Argument *MA = dyn_cast<Argument>(V))
     return MA->getParent() ? MA->getParent()->getParent() : 0;
@@ -197,11 +199,16 @@ void Helper::WriteOptimizationInfo(raw_ostream &Out, const User *U) {
   }
 }
 
+end caris */
+
 void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                                   TypeGen &TypePrinter,
                                   SlotTracker *Machine,
                                   const Module *Context) {
-  if (const ConstantInt *CI = dyn_cast<ConstantInt>(CV)) {
+    return;
+}
+    /*
+    if (const ConstantInt *CI = dyn_cast<ConstantInt>(CV)) {
     if (CI->getType()->isIntegerTy(1)) {
       Out << (CI->getZExtValue() ? "true" : "false");
       return;
@@ -498,6 +505,7 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
   Out << "<placeholder or erroneous Constant>";
 }
 
+/* caris
 void Helper::WriteMDNodeBodyInternal(raw_ostream &Out, const MDNode *Node,
                                     TypeGen *TypePrinter,
                                     SlotTracker *Machine,
@@ -520,92 +528,102 @@ void Helper::WriteMDNodeBodyInternal(raw_ostream &Out, const MDNode *Node,
   Out << "}";
 }
 
+    */
 
 /// WriteAsOperand - Write the name of the specified value out to the specified
 /// ostream.  This can be useful when you just want to print int %reg126, not
 /// the whole instruction that generated it.
-///
-void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
+
+/// this used to take in a Value instead of a Global Variable 
+void Helper::WriteAsOperandInternal(raw_ostream &Out, const GlobalVariable &GV,
                                    TypeGen *TypePrinter,
                                    SlotTracker *Machine,
-                                   const Module *Context) {
-  if (V->hasName()) {
-    PrintLLVMName(Out, V);
+                                   const Module Context) {
+
+  if (GV.hasName()) {
+    PrintLLVMName(Out, GV);
     return;
   }
-
-  const Constant *CV = dyn_cast<Constant>(V);
-  if (CV && !isa<GlobalValue>(CV)) {
+  
+}
+  /* caris
+  const Constant CV = dyn_cast<Constant>(*GV);
+  // was getting errors about not being ab;e to convert CV to a bool
+  // if (CV && !isa<GlobalValue>(CV)) {
+  if (!isa<GlobalValue>(CV)) {
     assert(TypePrinter && "Constants require TypeGen!");
-    WriteConstantInternal(Out, CV, *TypePrinter, Machine, Context);
+    WriteConstantInternal(Out, &CV, *TypePrinter, &Machine, *Context);
     return;
   }
 
-  if (const InlineAsm *IA = dyn_cast<InlineAsm>(V)) {
+  if (const InlineAsm IA = dyn_cast<InlineAsm>(*GV)) {
     Out << "asm ";
-    if (IA->hasSideEffects())
+    if (IA.hasSideEffects())
       Out << "sideeffect ";
-    if (IA->isAlignStack())
+    if (IA.isAlignStack())
       Out << "alignstack ";
     Out << '"';
-    PrintEscapedString(IA->getAsmString(), Out);
+    PrintEscapedString(IA.getAsmString(), Out);
     Out << "\", \"";
-    PrintEscapedString(IA->getConstraintString(), Out);
+    PrintEscapedString(IA.getConstraintString(), Out);
     Out << '"';
     return;
   }
-
-  if (const MDNode *N = dyn_cast<MDNode>(V)) {
-    if (N->isFunctionLocal()) {
+  // error: can't convert MDNode to bool
+  // if (const MDNode N = dyn_cast<MDNode>(*GV)) {
+  const MDNode N = dyn_cast<MDNode>(*GV)
+    // MDNode no longer has as isFunctionLocal() method 
+    // if (N->isFunctionLocal()) {
       // Print metadata inline, not via slot reference number.
-      WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
-      return;
-    }
+      //   WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
+      // return;
+      // }
   
-    if (!Machine) {
-      if (N->isFunctionLocal())
-        Machine = new SlotTracker(N->getFunction());
-      else
-        Machine = new SlotTracker(Context);
-    }
-    int Slot = Machine->getMetadataSlot(N);
+      // if (!Machine) {
+        // if (N->isFunctionLocal())
+        //Machine = new SlotTracker(N->getFunction());
+        // else
+    Machine = new SlotTracker(*Context);
+        // }
+    int Slot = Machine.getMetadataSlot(N);
     if (Slot == -1)
       Out << "<badref>";
     else
       Out << '!' << Slot;
     return;
-  }
+    // }
 
-  if (const MDString *MDS = dyn_cast<MDString>(V)) {
+  if (const MDString MDS = dyn_cast<MDString>(*GV)) {
     Out << "!\"";
-    PrintEscapedString(MDS->getString(), Out);
+    PrintEscapedString(MDS.getString(), Out);
     Out << '"';
     return;
   }
 
-  if (V->getValueID() == Value::PseudoSourceValueVal ||
-      V->getValueID() == Value::FixedStackPseudoSourceValueVal) {
-    V->print(Out);
-    return;
-  }
+  // these types no longer exist
+  // if (GV.getValueID() == Value::PseudoSourceValueVal ||
+  // GV.getValueID() == Value::FixedStackPseudoSourceValueVal) {
+  // GV.print(Out);
+  // return;
+  // }
 
   char Prefix = 'v';
   int Slot;
   if (Machine) {
-    if (const GlobalValue *GV = dyn_cast<GlobalValue>(V)) {
-      Slot = Machine->getGlobalSlot(GV);
+    if (const GlobalValue GGV = dyn_cast<GlobalValue>(*GV)) {
+      Slot = Machine->getGlobalSlot(GGV);
       Prefix = '_';
     } else {
-      Slot = Machine->getLocalSlot(V);
+      Slot = Machine->getLocalSlot(&GV);
     }
   } else {
-    Machine = createSlotTracker(V);
+    Machine = createSlotTracker(&GV);
     if (Machine) {
-      if (const GlobalValue *GV = dyn_cast<GlobalValue>(V)) {
-        Slot = Machine->getGlobalSlot(GV);
+      if (const GlobalValue GGV = dyn_cast<GlobalValue>(*GV)) {
+        Slot = Machine->getGlobalSlot(GGV);
         Prefix = '@';
       } else {
-        Slot = Machine->getLocalSlot(V);
+        Slot = Machine->getLocalSlot(&GV);
       }
       delete Machine;
     } else {
@@ -619,6 +637,7 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
     Out << "<badref>";
 }
 
+end caris  */
 void Helper::WriteAsOperand(raw_ostream &Out, const Value *V,
                           bool PrintType, const Module *Context) {
 
@@ -644,7 +663,7 @@ void Helper::WriteAsOperand(raw_ostream &Out, const Value *V,
 
   WriteAsOperandInternal(Out, V, &TypePrinter, 0, Context);
 }
-end caris comment */
+/* start caris
 
 void Helper::InitBE(raw_ostream &Out,bool BorE){
 	if (BorE){
@@ -857,19 +876,20 @@ int SlotTracker::getMetadataSlot(const MDNode *N) {
   return MI == mdnMap.end() ? -1 : (int)MI->second;
 }
 
+end caris comment */
 
 /// getLocalSlot - Get the slot number for a value that is local to a function.
-int SlotTracker::getLocalSlot(const Value *V) {
-  assert(!isa<Constant>(V) && "Can't get a constant or global slot with this!");
+int SlotTracker::getLocalSlot(const GlobalVariable *GV) {
+  assert(!isa<Constant>(*GV) && "Can't get a constant or global slot with this!");
 
   // Check for uninitialized state and do lazy initialization.
   initialize();
 
-  ValueMap::iterator FI = fMap.find(V);
+  ValueMap::iterator FI = fMap.find(GV);
   return FI == fMap.end() ? -1 : (int)FI->second;
 }
 
-
+/* caris comment
 /// CreateModuleSlot - Insert the specified GlobalValue* into the slot table.
 void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
   assert(V && "Can't insert a null Value into SlotTracker!");

@@ -49,15 +49,15 @@ public:
 	static const Module *getModuleFromVal(const Value *V);
 	static void PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix); 
 
-	static void PrintLLVMName(raw_ostream &OS, const Value *V);
+	static void PrintLLVMName(raw_ostream &OS, const GlobalVariable &GV);
 
 	static void PrintEscapedString(StringRef Name,raw_ostream &Out);
 
 	static void WriteAsOperandInternal(
-			raw_ostream &Out, const Value *V,
+			raw_ostream &Out, const GlobalVariable &GV,
 			TypeGen *TypePrinter,
 			SlotTracker *Machine,
-			const Module *Context);
+			const Module Context);
 
 	static const char *getPredicateText(unsigned predicate);
 	
