@@ -127,11 +127,6 @@ all: make_builddir \
 #test: emit_build_config
 #	python3 test/all_tests.py
 
-# does this just make a text file with the llvm bin path?
-#.PHONY: emit_build_config
-#emit_build_config: make_builddir
-#	@echo $(LLVM_BIN_PATH) > $(BUILD_DIR)/_build_config
-
 .PHONY: make_builddir
 make_builddir:
 	@test -d $(BUILD_DIR) || mkdir $(BUILD_DIR)
@@ -148,7 +143,7 @@ emit_build_config: make_builddir
 #	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
 
 # making pmGen executable
-$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o $(BUILD_DIR)/Helper.o
+$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o $(BUILD_DIR)/Helper.o $(BUILD_DIR)/TypeGen.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LLVM_LDFLAGS)  
 
 # compiling main.o
@@ -159,11 +154,11 @@ $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp
 $(BUILD_DIR)/IO.o: $(LIB_DIR)/IO/IO.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
-$(BUILD_DIR)/Helper.o: $(LIB_DIR)/Helper/TypeGen.cpp
+$(BUILD_DIR)/TypeGen.o: $(LIB_DIR)/Helper/TypeGen.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
-#$(BUILD_DIR)/helper.o: $(LIB_DIR)/Helper/Helper.cpp
-#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
+$(BUILD_DIR)/Helper.o: $(LIB_DIR)/Helper/Helper.cpp
+	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
 #$(BUILD_DIR)/io.o: $(LIB_DIR)/IO/IO.cpp
 #	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@

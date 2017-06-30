@@ -5,7 +5,7 @@
 #include "SlotTracker.h"
 //#include "FunctionGen.h"
 
-//OLD#include "llvm/Support/FormattedStream.h"
+#include "llvm/Support/FormattedStream.h"
 
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Module.h"
@@ -49,16 +49,17 @@ int main (int argc, char ** argv)
 	std::vector<const Type*> numberedTypes;
 	TypeFinder typeFinder(TypeGener,numberedTypes);
 	typeFinder.Run(*m);
-    std::cout << "working to this point" << "\n";
-    /*
+    
     formatted_raw_ostream OS(outs());
 
     // getTypeSymbolTable just returns an (empty?) table. it contains a map of type, symbol pairs
 	// i believe gen is supposed to populate this table
-    typegener.gen(numberedTypes,m->getTypeSymbolTable(),outs());
+    TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
 	if (!m->global_empty()) outs()<<'\n';
 	Helper::InitBE(initProc,true);
-	for (Module::const_global_iterator GI=m->global_begin(),GE=m->global_end();
+    std::cout << "working to this point" << "\n";
+	/*
+    for (Module::const_global_iterator GI=m->global_begin(),GE=m->global_end();
 			GI!=GE;++GI){
 		if (!conStr.isConStr(GI)){
 			GVTmp.clear();

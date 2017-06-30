@@ -4,19 +4,24 @@
 #include "TypeFinder.h"
 #include "Define.h"
 
-#include "llvm/Assembly/Writer.h"
-#include "llvm/Module.h"
-#include "llvm/DerivedTypes.h"
-#include "llvm/IntrinsicInst.h"
-#include "llvm/InlineAsm.h"
-#include "llvm/Operator.h"
-#include "llvm/ADT/SmallString.h"
-#include "llvm/ADT/DenseSet.h"
+//OLD#include "llvm/Assembly/Writer.h"
+//OLD#include "llvm/Module.h"
+//OLD#include "llvm/DerivedTypes.h"
+//OLD#include "llvm/IntrinsicInst.h"
+//OLD#include "llvm/InlineAsm.h"
+#include "llvm/IR/Operator.h"
+//OLD#include "llvm/ADT/SmallString.h"
+//OLD#include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/ADT/APFloat.h"
 
 using namespace llvm;
 
+/* caris comment
 
 // PrintEscapedString - Print each character of the specified string, escaping
 // it if it is not printable or if it is an escape char.
@@ -61,6 +66,7 @@ void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 			char C = Name[i];
 			if (!isalnum(C) && C != '-' && C != '.' && C != '_') {
 				NeedsQuotes = true;
+
 				break;
 			}
 		}
@@ -77,6 +83,7 @@ void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 //	OS << '"';
 //	PrintEscapedString(Name, OS);
 //	OS << '"';
+/* caris comment
 }
 
 /// PrintLLVMName - Turn the specified name into an 'LLVM name', which is either
@@ -118,20 +125,22 @@ SlotTracker *Helper::createSlotTracker(const Value *V) {
     return new SlotTracker(BB->getParent());
 
   if (const GlobalVariable *GV = dyn_cast<GlobalVariable>(V))
-    return new SlotTracker(GV->getParent());
+    return new SlotTracker(*GV->getParent());
 
   if (const GlobalAlias *GA = dyn_cast<GlobalAlias>(V))
-    return new SlotTracker(GA->getParent());
+    return new SlotTracker(*GA->getParent());
 
   if (const Function *Func = dyn_cast<Function>(V))
     return new SlotTracker(Func);
 
-  if (const MDNode *MD = dyn_cast<MDNode>(V)) {
-    if (!MD->isFunctionLocal())
-      return new SlotTracker(MD->getFunction());
+  // MetaData is no longer a subclass of Value
+  // (see line 452 of llvm/Metadata.h)
+  // if (const MDNode *MD = dyn_cast<MDNode>(V)) {
+  //   if (!MD->isFunctionLocal())
+  //     return new SlotTracker(MD->getFunction());
 
-    return new SlotTracker((Function *)0);
-  }
+  //  return new SlotTracker((Function *)0);
+  // }
 
   return 0;
 }
@@ -634,6 +643,7 @@ void Helper::WriteAsOperand(raw_ostream &Out, const Value *V,
 
   WriteAsOperandInternal(Out, V, &TypePrinter, 0, Context);
 }
+end caris comment */
 
 void Helper::InitBE(raw_ostream &Out,bool BorE){
 	if (BorE){
@@ -641,7 +651,7 @@ void Helper::InitBE(raw_ostream &Out,bool BorE){
 	}else Out << "  run _main(_syn);\n}\n";
 	return ;
 }
-
+/* caris comment
 void Helper::InitGValue(raw_ostream &Out,const GlobalVariable *GV,TypeGen *TypePrinter,
 		SlotTracker *Machine,const Module *Context){
 
@@ -897,5 +907,4 @@ void SlotTracker::CreateMetadataSlot(const MDNode *N) {
     if (const MDNode *Op = dyn_cast_or_null<MDNode>(N->getOperand(i)))
       CreateMetadataSlot(Op);
 }
-
-
+end caris comment */ 
