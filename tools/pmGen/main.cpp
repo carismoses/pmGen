@@ -60,10 +60,9 @@ int main (int argc, char ** argv)
     std::cout << "working to this point" << "\n";
 	for (Module::const_global_iterator GI=m->global_begin(),GE=m->global_end();
          GI!=GE;++GI) {
-        GI->getType();
-        conStr.isConStr(*GI);
-            // if (!conStr.isConStr(GI)){
-			// GVTmp.clear();
+        // don't want string constant global variables?
+        if (!conStr.isConStr(*GI)){
+            GVTmp.clear();
 			// TypeGener.print(GI->getType()->getElementType(),gvTmp);
 			// gvTmp<<' ';	
 			// Helper::WriteAsOperandInternal(gvTmp,GI,&TypeGener,&SlotTable,GI->getParent());
@@ -73,7 +72,7 @@ int main (int argc, char ** argv)
 			// if (GI->hasInitializer())
 			//  	Helper::InitGValue(initProc,GI,&TypeGener,&SlotTable,GI->getParent());
 			// outs()<<GVTmp;
-            // }
+        }
 	}
 
 	// FunctionGen functionGener(TypeGener,SlotTable,OS,m);

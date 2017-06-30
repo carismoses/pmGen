@@ -18,6 +18,7 @@
 #include "llvm/IR/Metadata.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/ADT/APFloat.h"
+#include "llvm/IR/Constants.h"
 
 using namespace llvm;
 
@@ -702,10 +703,12 @@ caris */
 
 ConStr *ConStr::pConStr=new ConStr();
 bool ConStr::isConStr(const GlobalVariable &V){
-	if (V->hasInitializer()){
-		const ConstantArray *CA=dyn_cast<ConstantArray>(V->getInitializer());
-		if (CA && CA->isString()){
-			get()->conStr.insert(std::pair<StringRef,std::string>(V->getName(),CA->getAsString()));
+	if (V.hasInitializer()){
+        // the ConstantArray type no longer had the necessary functions
+		//const ConstantArray *CA=dyn_cast<ConstantArray>(V.getInitializer());
+        const ConstantDataSequential *CDS=dyn_cast<ConstantDataSequential>(V.getInitializer());
+		if (CDS && CDS->isString()){
+			get()->conStr.insert(std::pair<StringRef,std::string>(V.getName(),CDS->getAsString()));
 			return true;
 		}
 	}
@@ -721,11 +724,11 @@ bool ConStr::isExist(const StringRef name){
 std::string ConStr::getString(const StringRef name){
 	return get()->conStr.find(name)->second;
 }
-
+caris */
 ConStr *ConStr::get(){
 	return ConStr::pConStr;
 }
-
+/* caris
 // Module level constructor. Causes the contents of the Module (sans functions)
 // to be added to the slot table.
 SlotTracker::SlotTracker(const Module *M)
