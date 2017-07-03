@@ -38,8 +38,10 @@ int main (int argc, char ** argv)
 	}
 
 	std::unique_ptr<Module> m=parseModule(InputFileName,Context);
-//	outs()<<*m<<"\n-----------------------\n\n";
 
+    outs()<<*m<<"\n-----------------------\n\n";
+
+    /*
 	//Module::global_iterator begin=m->global_begin();
 	//Module::global_iterator end=m->global_end();
 	TypeGen TypeGener;
@@ -66,20 +68,21 @@ int main (int argc, char ** argv)
 			TypeGener.print(GI->getType()->getElementType(),gvTmp);
 			gvTmp<<' ';	
 			Helper::WriteAsOperandInternal(gvTmp,*GI,&TypeGener,&SlotTable,GI->getParent());
-			// gvTmp<<";\n";
-			// gvTmp.flush();
-			// Helper::Formatting(GVTmp);
-			// if (GI->hasInitializer())
-			//  	Helper::InitGValue(initProc,GI,&TypeGener,&SlotTable,GI->getParent());
-			// outs()<<GVTmp;
+            gvTmp<<";\n";
+            gvTmp.flush();
+            Helper::Formatting(GVTmp);
+            if (GI->hasInitializer())
+			  	Helper::InitGValue(initProc,GI,&TypeGener,&SlotTable,GI->getParent());
+            outs()<<GVTmp;
         }
 	}
 
-	// FunctionGen functionGener(TypeGener,SlotTable,OS,m);
-	// for (Module::const_iterator FI=m->begin(),FE=m->end();FI!=FE;++FI){
-	// 	functionGener.printFunction(FI);
-	// }
-	// Helper::InitBE(initProc,false);
-	// outs()<<initProc.str();
-	return 0;
+    FunctionGen functionGener(TypeGener,SlotTable,OS,m);
+    for (Module::const_iterator FI=m->begin(),FE=m->end();FI!=FE;++FI){
+	 	functionGener.printFunction(FI);
+	}
+	Helper::InitBE(initProc,false);
+	outs()<<initProc.str();
+    */	
+    return 0;
 }
