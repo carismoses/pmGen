@@ -1,5 +1,6 @@
 #include "IO.h"
 #include "TypeGen.h"
+#include "Helper.h"
 #include "SlotTracker.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Module.h"
@@ -43,8 +44,9 @@ int main (int argc, char ** argv)
 	TypeGen TypeGener;
     SlotTracker SlotTable(*m);
 
+    
+    ConStr conStr;
     /*
-      ConStr conStr;
       std::vector<const Type*> numberedTypes;
       TypeFinder typeFinder(TypeGener,numberedTypes);
       typeFinder.Run(*m);
