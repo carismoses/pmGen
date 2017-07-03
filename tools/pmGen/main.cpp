@@ -5,6 +5,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Type.h"
 #include <iostream>
 
 // #include "TypeFinder.h"
@@ -43,11 +44,11 @@ int main (int argc, char ** argv)
 	//Module::global_iterator end=m->global_end();
 	TypeGen TypeGener;
     SlotTracker SlotTable(*m);
-
     
     ConStr conStr;
+    
+    std::vector<const Type*> numberedTypes;
     /*
-      std::vector<const Type*> numberedTypes;
       TypeFinder typeFinder(TypeGener,numberedTypes);
       typeFinder.Run(*m);
     
