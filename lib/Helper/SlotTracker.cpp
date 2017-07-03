@@ -1,5 +1,7 @@
+#include "SlotTracker.h"
+#include "llvm/IR/Module.h"
+
 // #include "Helper.h"
-// #include "SlotTracker.h"
 // #include "TypeGen.h"
 // #include "TypeFinder.h"
 // #include "Define.h"
@@ -25,11 +27,11 @@ using namespace llvm;
 
 // Module level constructor. Causes the contents of the Module (sans functions)
 // to be added to the slot table.
-SlotTracker::SlotTracker(const Module *M)
+SlotTracker::SlotTracker(const Module& M)
     : TheModule(M), TheFunction(0), FunctionProcessed(false), 
       mNext(0), fNext(0),  mdnNext(0) {
 }
-
+/*
 // Function level constructor. Causes the contents of the Module and the one
 // function provided to be added to the slot table.
 SlotTracker::SlotTracker(const Function *F)
@@ -151,7 +153,6 @@ int SlotTracker::getMetadataSlot(const MDNode *N) {
     return MI == mdnMap.end() ? -1 : (int)MI->second;
 }
 
-end caris comment */
 
 /// getLocalSlot - Get the slot number for a value that is local to a function.
 int SlotTracker::getLocalSlot(const GlobalVariable *GV) {
@@ -206,3 +207,4 @@ void SlotTracker::CreateMetadataSlot(const MDNode *N) {
         if (const MDNode *Op = dyn_cast_or_null<MDNode>(N->getOperand(i)))
             CreateMetadataSlot(Op);
 }
+*/
