@@ -1,23 +1,18 @@
-#include "test.h"
 #include "IO.h"
-#include "TypeFinder.h"
-#include "Helper.h"
-#include "SlotTracker.h"
-//#include "FunctionGen.h"
-
-#include "llvm/Support/FormattedStream.h"
-
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Module.h"
-
-#include "llvm/AsmParser/Parser.h"
 #include "llvm/IR/LLVMContext.h"
-//#include "llvm/IR/ModuleSlotTracker.h"
+#include <iostream>
+
+// #include "TypeFinder.h"
+// #include "Helper.h"
+// #include "SlotTracker.h"
+// #include "FunctionGen.h"
+// #include "llvm/Support/FormattedStream.h"
+// #include "llvm/AsmParser/Parser.h"
+// #include "llvm/IR/ModuleSlotTracker.h"
 //OLD#include "llvm/Assembly/Writer.h"
 //OLD#include "llvm/TypeSymbolTable.h"
-
-// this is just for testing
-#include <iostream>
 
 using namespace llvm;
 
@@ -39,14 +34,13 @@ int main (int argc, char ** argv)
 
 	std::unique_ptr<Module> m=parseModule(InputFileName,Context);
 
-    outs()<<*m<<"\n-----------------------\n\n";
-
+    // outs()<<*m<<"\n-----------------------\n\n";
     /*
 	//Module::global_iterator begin=m->global_begin();
 	//Module::global_iterator end=m->global_end();
 	TypeGen TypeGener;
 	SlotTracker SlotTable(*m);
-    
+
 	ConStr conStr;
 	std::vector<const Type*> numberedTypes;
 	TypeFinder typeFinder(TypeGener,numberedTypes);
