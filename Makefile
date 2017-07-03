@@ -139,9 +139,6 @@ make_bindir:
 emit_build_config: make_builddir
 	@echo $(LLVM_BIN_PATH) > $(BUILD_DIR)/_build_config
 
-#$(BIN_DIR)/pmGen: $(BIN_DIR)/helper.a $(BIN_DIR)/io.a $(BIN_DIR)/test.a $(BUILD_DIR)/main.o
-#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) $^ $(LLVM_LDFLAGS) -o $@
-
 # making pmGen executable
 $(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o $(BUILD_DIR)/TypeGen.o $(BUILD_DIR)/SlotTracker.o #$(BUILD_DIR)/Helper.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LLVM_LDFLAGS)  
