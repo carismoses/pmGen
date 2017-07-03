@@ -1,9 +1,10 @@
+#include "TypeFinder.h"
 #include "TypeGen.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/IR/Type.h"
+#include "llvm/IR/Module.h"
 
+// #include "llvm/ADT/DenseMap.h"
+// #include "llvm/IR/Type.h"
 // #include "Helper.h"
-// #include "TypeFinder.h"
 // #include "llvm/ADT/StringExtras.h"
 // #include "llvm/ADT/STLExtras.h"
 //OLD#include "llvm/TypeSymbolTable.h"
@@ -15,16 +16,17 @@
 using namespace llvm;
 
 void TypeFinder::Run(const Module &M) {
-    //AddModuleTypesToPrinter(TP,&M);
+    AddModuleTypesToPrinter(&M);
 
+    /*
     // Get types from the type symbol table.  This gets opaque types referened
     // only through derived named types.
-    //const ValueSymbolTable &ST = M.getValueSymbolTable();
-    //for (ValueSymbolTable::const_iterator TI = ST.begin(), E = ST.end();
-    //       TI != E; ++TI)
-    //	IncorporateType(TI->second);
+    const ValueSymbolTable &ST = M.getValueSymbolTable();
+    for (ValueSymbolTable::cgonst_iterator TI = ST.begin(), E = ST.end();
+           TI != E; ++TI)
+        IncorporateType(TI->second);
 
-    // change from incorporate type (from TypeSymbolTable) to incporporate value
+    // change from incorporate type (from TypeSymbolTable) to incorporate value
     // (from ValueSymbolTable)
     const ValueSymbolTable &ST = M.getValueSymbolTable();
     for (ValueSymbolTable::const_iterator VI = ST.begin(), E = ST.end();
@@ -63,8 +65,10 @@ void TypeFinder::Run(const Module &M) {
                     IncorporateValue(*OI);
             }
     }
+    */
 }
 
+/*
 void TypeFinder::IncorporateType(const Type *Ty) {
     // Check to see if we're already visited this type.
     if (!VisitedTypes.insert(Ty).second)
@@ -105,14 +109,16 @@ void TypeFinder::IncorporateValue(const Value *V) {
              E = C->op_end(); I != E;++I)
         IncorporateValue(*I);
 }
+*/
 
-void TypeFinder::AddModuleTypesToPrinter(TypeGen &TP,
-                                         const Module *M) {
+void TypeFinder::AddModuleTypesToPrinter(const Module *M) {
     if (M == 0) return;
 
+    
     // If the module has a symbol table, take all global types and stuff their
     // names into the TypeNames map.
     const ValueSymbolTable &ST = M->getValueSymbolTable();
+    /*
     for (ValueSymbolTable::const_iterator VI = ST.begin(), E = ST.end();
          VI != E; ++VI) {
 
@@ -142,4 +148,6 @@ void TypeFinder::AddModuleTypesToPrinter(TypeGen &TP,
         NameOS.flush();
         TP.addTypeName(Ty, NameStr);
     }
+    */
 }
+

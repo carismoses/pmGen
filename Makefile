@@ -140,7 +140,7 @@ emit_build_config: make_builddir
 	@echo $(LLVM_BIN_PATH) > $(BUILD_DIR)/_build_config
 
 # making pmGen executable
-$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o $(BUILD_DIR)/TypeGen.o $(BUILD_DIR)/SlotTracker.o #$(BUILD_DIR)/Helper.o
+$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o $(BUILD_DIR)/TypeGen.o $(BUILD_DIR)/TypeFinder.o $(BUILD_DIR)/SlotTracker.o #$(BUILD_DIR)/Helper.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LLVM_LDFLAGS)  
 
 # compiling main.o
@@ -152,6 +152,9 @@ $(BUILD_DIR)/IO.o: $(LIB_DIR)/IO/IO.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
 $(BUILD_DIR)/TypeGen.o: $(LIB_DIR)/Helper/TypeGen.cpp
+	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
+
+$(BUILD_DIR)/TypeFinder.o: $(LIB_DIR)/Helper/TypeFinder.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
 #$(BUILD_DIR)/Helper.o: $(LIB_DIR)/Helper/Helper.cpp

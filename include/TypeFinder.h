@@ -1,16 +1,16 @@
 #ifndef PMG_TYPEFINDER_H
 #define PMG_TYPEFINDER_H
 
-//OLD#include "llvm/Assembly/Writer.h"
-//OLD#include "llvm/Module.h"
-//OLD#include "llvm/DerivedTypes.h"
-//OLD#include "llvm/Support/ErrorHandling.h"
-
 #include "TypeGen.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Module.h"
 #include "llvm/ADT/DenseSet.h"
+
+//OLD#include "llvm/Assembly/Writer.h"
+//OLD#include "llvm/Module.h"
+//OLD#include "llvm/DerivedTypes.h"
+//OLD#include "llvm/Support/ErrorHandling.h"
 
 namespace llvm {
 
@@ -35,7 +35,10 @@ namespace llvm {
         /// walked in other ways.  GlobalValues, basic blocks, instructions, and
         /// inst operands are all explicitly enumerated.
         void IncorporateValue(const Value *V);
-        void AddModuleTypesToPrinter(TypeGen &TP,const Module *M);
+
+        // I think this was originally used to get all types from a module
+        // but llvm 5.0 doesn't have a Module->getTypeSymbolTable function anymore
+        void AddModuleTypesToPrinter(const Module *M);
     };
 
 }
