@@ -1,4 +1,8 @@
-// #include "Helper.h"
+#include "Helper.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
+#include <string>
+
 // #include "SlotTracker.h"
 // #include "TypeGen.h"
 // #include "TypeFinder.h"
@@ -14,7 +18,6 @@
 // #include "llvm/ADT/APFloat.h"
 // #include "llvm/IR/Constants.h"
 // #include "llvm/IR/Constant.h"
-
 //OLD#include "llvm/Assembly/Writer.h"
 //OLD#include "llvm/Module.h"
 //OLD#include "llvm/IntrinsicInst.h"
@@ -23,6 +26,7 @@
 
 using namespace llvm;
 
+/*
 // PrintEscapedString - Print each character of the specified string, escaping
 // it if it is not printable or if it is an escape char.
 void Helper::PrintEscapedString(StringRef Name, raw_ostream &Out) {
@@ -38,10 +42,7 @@ void Helper::PrintEscapedString(StringRef Name, raw_ostream &Out) {
 void Helper::test(raw_ostream &OS,StringRef Name){
 	OS<<Name.str();
 }
-
-/// PrintLLVMName - Turn the specified name into an 'LLVM name', which is either
-/// prefixed with % (if the string only contains simple characters) or is
-/// surrounded with ""'s (if it has special chars in it).  Print it out.
+*/
 void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 	assert(Name.data() && "Cannot get empty name!");
 	switch (Prefix) {
@@ -86,10 +87,8 @@ void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 
 }
 
+/*
 
-/// PrintLLVMName - Turn the specified name into an 'LLVM name', which is either
-/// prefixed with % (if the string only contains simple characters) or is
-/// surrounded with ""'s (if it has special chars in it).  Print it out.
 void Helper::PrintLLVMName(raw_ostream &OS, const GlobalVariable &GV) {
 	PrintLLVMName(OS, GV.getName(),
                 isa<GlobalValue>(GV) ? GlobalPrefix : LocalPrefix);
@@ -744,4 +743,5 @@ std::string ConStr::getString(const StringRef name){
 ConStr *ConStr::get(){
 	return ConStr::pConStr;
 }
+*/
 
