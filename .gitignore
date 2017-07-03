@@ -1,2 +1,5 @@
 Debug/
 build/
+bin/
+**#*
+.#*
