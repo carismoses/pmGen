@@ -1,17 +1,20 @@
-#include "Helper.h"
-#include "TypeFinder.h"
 #include "TypeGen.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/IR/Type.h"
 
-#include "llvm/ADT/StringExtras.h"
-#include "llvm/ADT/STLExtras.h"
+// #include "Helper.h"
+// #include "TypeFinder.h"
+// #include "llvm/ADT/StringExtras.h"
+// #include "llvm/ADT/STLExtras.h"
 //OLD#include "llvm/TypeSymbolTable.h"
-#include "llvm/IR/ValueSymbolTable.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Support/FormattedStream.h"
-#include <cctype>
+// #include "llvm/IR/ValueSymbolTable.h"
+// #include "llvm/Support/raw_ostream.h"
+// #include "llvm/Support/FormattedStream.h"
+// #include <cctype>
+
 
 using namespace llvm;
-
+/*
 void TypeFinder::Run(const Module &M) {
 	//AddModuleTypesToPrinter(TP,&M);
 
@@ -104,7 +107,6 @@ void TypeFinder::IncorporateValue(const Value *V) {
 		IncorporateValue(*I);
 }
 
-/*
 void TypeFinder::AddModuleTypesToPrinter(TypeGen &TP,
                              const Module *M) {
 	if (M == 0) return;
@@ -143,11 +145,12 @@ void TypeFinder::AddModuleTypesToPrinter(TypeGen &TP,
 	}
 }
 */
-
+/// getTypeNamesMap takes the input (a void pointer) and static_casts it
+/// as a pointer to a DenseMap
 static DenseMap<const Type *, std::string> &getTypeNamesMap(void *M) {
 	return *static_cast<DenseMap<const Type *, std::string>*>(M);
 }
-
+/*
 void TypeGen::clear() {
 	getTypeNamesMap(TypeNames).clear();
 }
@@ -160,15 +163,18 @@ void TypeGen::addTypeName(const Type *Ty, const std::string &N) {
 	getTypeNamesMap(TypeNames).insert(std::make_pair(Ty, N));
 }
 
-
+*/
 TypeGen::TypeGen() {
 	TypeNames = new DenseMap<const Type *, std::string>();
 }
 
+/// destructor: gets the DenseMap from the TypeNames
+/// and deletes it
 TypeGen::~TypeGen() {
 	delete &getTypeNamesMap(TypeNames);
 }
 
+/*
 /// CalcTypeName - Write the specified type to the specified raw_ostream, making
 /// use of type names or up references to shorten the type name where possible.
 void TypeGen::CalcTypeName(
@@ -339,3 +345,4 @@ void TypeGen::gen(std::vector<const Type*> numberedTypes,const ValueSymbolTable 
 	// 	OS<<'\n';
 	// }
 }
+*/

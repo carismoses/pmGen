@@ -1,4 +1,5 @@
 #include "IO.h"
+#include "TypeGen.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
@@ -32,22 +33,22 @@ int main (int argc, char ** argv)
 		exit(1);
 	}
 
-	std::unique_ptr<Module> m=parseModule(InputFileName,Context);
+	std::unique_ptr<Module> m = parseModule(InputFileName,Context);
 
     // outs()<<*m<<"\n-----------------------\n\n";
-    /*
+    
 	//Module::global_iterator begin=m->global_begin();
 	//Module::global_iterator end=m->global_end();
 	TypeGen TypeGener;
-	SlotTracker SlotTable(*m);
+    /*
+    SlotTracker SlotTable(*m);
 
 	ConStr conStr;
 	std::vector<const Type*> numberedTypes;
 	TypeFinder typeFinder(TypeGener,numberedTypes);
 	typeFinder.Run(*m);
     
-    formatted_raw_ostream OS(outs());
-
+   
     // getTypeSymbolTable just returns an (empty?) table. it contains a map of type, symbol pairs
 	// i believe gen is supposed to populate this table
     TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());

@@ -1,11 +1,15 @@
 #ifndef PMG_TYPEGEN_H
 #define PMG_TYPEGEN_H
 
-//OLD#include "llvm/TypeSymbolTable.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/ValueSymbolTable.h"
-
 #include <string>
 #include <vector>
+
+//OLD#include "llvm/TypeSymbolTable.h"
 
 namespace llvm {
 
@@ -18,6 +22,7 @@ template <typename T> class SmallVectorImpl;
 class TypeGen {
 	void *TypeNames;
 public:
+    // constructor and destructor functions defined in source code
 	TypeGen();
 	~TypeGen();
 	
