@@ -660,14 +660,14 @@ void Helper::WriteAsOperand(raw_ostream &Out, const Value *V,
 
   WriteAsOperandInternal(Out, V, &TypePrinter, 0, Context);
 }
-
+*/
 void Helper::InitBE(raw_ostream &Out,bool BorE){
 	if (BorE){
 		Out<<"init {\nchan _syn = [0] of { int };\n";
 	}else Out << "  run _main(_syn);\n}\n";
 	return ;
 }
-
+/*
 void Helper::InitGValue(raw_ostream &Out,const GlobalVariable *GV,TypeGen *TypePrinter,
 		SlotTracker *Machine,const Module *Context){
 

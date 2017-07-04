@@ -91,6 +91,8 @@ namespace llvm {
                                    raw_ostream &Out,const Value *V,
                                    bool PrintType,const Module *Context);
 
+        /// initializes a PROMELA channel I think?
+        ///
         static void InitBE(raw_ostream &Out,bool BorE);
 
         static void InitGValue(

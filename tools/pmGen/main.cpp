@@ -56,35 +56,39 @@ int main (int argc, char ** argv)
     // populate TypeGener and numberedTypes with all types from Module
     typeFinder.Run(*m);
 
+    // print all type names
     TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
 
-    /*
+    // if there are global variables
     if (!m->global_empty()) outs()<<'\n';
+
     Helper::InitBE(initProc,true);
+
+    /*
     std::cout << "working to this point" << "\n";
     for (Module::const_global_iterator GI=m->global_begin(),GE=m->global_end();
-    GI!=GE;++GI) {
-    // don't want string constant global variables?
-    if (!conStr.isConStr(*GI)){
-    GVTmp.clear();
-    TypeGener.print(GI->getType()->getElementType(),gvTmp);
-    gvTmp<<' ';	
-    Helper::WriteAsOperandInternal(gvTmp,*GI,&TypeGener,&SlotTable,GI->getParent());
-    gvTmp<<";\n";
-    gvTmp.flush();
-    Helper::Formatting(GVTmp);
-    if (GI->hasInitializer())
-    Helper::InitGValue(initProc,GI,&TypeGener,&SlotTable,GI->getParent());
-    outs()<<GVTmp;
-    }
+         GI!=GE;++GI) {
+        // don't want string constant global variables?
+        if (!conStr.isConStr(*GI)){
+            GVTmp.clear();
+            TypeGener.print(GI->getType()->getElementType(),gvTmp);
+            gvTmp<<' ';	
+            Helper::WriteAsOperandInternal(gvTmp,*GI,&TypeGener,&SlotTable,GI->getParent());
+            gvTmp<<";\n";
+            gvTmp.flush();
+            Helper::Formatting(GVTmp);
+            if (GI->hasInitializer())
+                Helper::InitGValue(initProc,GI,&TypeGener,&SlotTable,GI->getParent());
+            outs()<<GVTmp;
+        }
     }
 
     FunctionGen functionGener(TypeGener,SlotTable,OS,m);
     for (Module::const_iterator FI=m->begin(),FE=m->end();FI!=FE;++FI){
-    functionGener.printFunction(FI);
+        functionGener.printFunction(FI);
     }
     Helper::InitBE(initProc,false);
     outs()<<initProc.str();
     */	
-    return 0;
+        return 0;
 }
