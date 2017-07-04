@@ -29,6 +29,7 @@ int main (int argc, char ** argv)
 	std::string GVTmp;
 	raw_string_ostream initProc(InitProc);
 	raw_string_ostream gvTmp(GVTmp);
+    
 	if (argc>1){
 		InputFileName=argv[1];
         
@@ -43,26 +44,21 @@ int main (int argc, char ** argv)
         exit(1);
     }
 
+    // get Module from input file
     std::unique_ptr<Module> m = parseModule(InputFileName,Context);
-
-    // outs()<<*m<<"\n-----------------------\n\n";
     
-	//Module::global_iterator begin=m->global_begin();
-	//Module::global_iterator end=m->global_end();
 	TypeGen TypeGener;
     SlotTracker SlotTable(*m);
-    
     ConStr conStr;
-    
     std::vector<const Type*> numberedTypes;
     TypeFinder typeFinder(TypeGener,numberedTypes);
-      
+
+    // populate TypeGener and numberedTypes with all types from Module
     typeFinder.Run(*m);
-    
-    /*
-    // getTypeSymbolTable just returns an (empty?) table. it contains a map of type, symbol pairs
-    // i believe gen is supposed to populate this table
+
     TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
+
+    /*
     if (!m->global_empty()) outs()<<'\n';
     Helper::InitBE(initProc,true);
     std::cout << "working to this point" << "\n";
