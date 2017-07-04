@@ -7,6 +7,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Type.h"
+#include <unistd.h>
 
 // #include "TypeFinder.h"
 // #include "Helper.h"
@@ -30,13 +31,19 @@ int main (int argc, char ** argv)
 	raw_string_ostream gvTmp(GVTmp);
 	if (argc>1){
 		InputFileName=argv[1];
-	}
-	else {
-		errs() << "Please input the .bc file.\n";
-		exit(1);
-	}
+        
+        // check if the file exists
+        if (access(InputFileName.c_str(), F_OK ) == -1) {
+            errs() << "Given file does not exist. \n";
+            exit(1);
+        }
+    }
+    else {
+        errs() << "Please input the .bc file.\n";
+        exit(1);
+    }
 
-	std::unique_ptr<Module> m = parseModule(InputFileName,Context);
+    std::unique_ptr<Module> m = parseModule(InputFileName,Context);
 
     // outs()<<*m<<"\n-----------------------\n\n";
     
