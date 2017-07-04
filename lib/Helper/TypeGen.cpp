@@ -182,7 +182,7 @@ void TypeGen::print(const Type *Ty, raw_ostream &OS,
         DenseMap<const Type*, std::string>::iterator I = TM.find(Ty);
         // if the type name (Ty) is in the map from TypeNames
         if (I != TM.end()) {
-            OS << I->second; // this returns the type from the TM
+            OS << I->second; // I->second returns the type from the TypeMapEntry
             return;
         }
     }
@@ -195,14 +195,11 @@ void TypeGen::print(const Type *Ty, raw_ostream &OS,
 
     raw_string_ostream TypeOS(TypeName);
     CalcTypeName(Ty, TypeStack, TypeOS, IgnoreTopLevelName);
-    /*
-      OS << TypeOS.str();
+    OS << TypeOS.str();
 
-      // Cache type name for later use.
-      if (!IgnoreTopLevelName)
-      TM.insert(std::make_pair(Ty, TypeOS.str()));
-    */
-    return;
+    // Cache type name for later use.
+    if (!IgnoreTopLevelName)
+        TM.insert(std::make_pair(Ty, TypeOS.str()));
 }
 
 void TypeGen::gen(std::vector<const Type*> numberedTypes,const ValueSymbolTable &ST,raw_ostream &OS){
