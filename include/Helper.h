@@ -66,10 +66,10 @@ namespace llvm {
         static void PrintEscapedString(StringRef Name,raw_ostream &Out);
 
         static void WriteAsOperandInternal(
-                                           raw_ostream &Out, const GlobalVariable &GV,
+                                           raw_ostream &Out, const Value &V,
                                            TypeGen *TypePrinter,
                                            SlotTracker *Machine,
-                                           const Module Context);
+                                           const Module *Context);
 
         static const char *getPredicateText(unsigned predicate);
 	

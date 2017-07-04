@@ -64,25 +64,34 @@ int main (int argc, char ** argv)
 
     Helper::InitBE(initProc,true);
 
-    /*
-    std::cout << "working to this point" << "\n";
     for (Module::const_global_iterator GI=m->global_begin(),GE=m->global_end();
          GI!=GE;++GI) {
-        // don't want string constant global variables?
+        // if it has an initializer and is of type ConstantDataSequential.isString(), add it to conStr
+        // else, enter this loop
         if (!conStr.isConStr(*GI)){
             GVTmp.clear();
+            // not sure what this is doing. getType() doesn't appear to be  function of GlobalVariable...
             TypeGener.print(GI->getType()->getElementType(),gvTmp);
-            gvTmp<<' ';	
-            Helper::WriteAsOperandInternal(gvTmp,*GI,&TypeGener,&SlotTable,GI->getParent());
+            
+            gvTmp<<' ';
+            if(const Value *V = dyn_cast<Value>(GI)){
+                Helper::WriteAsOperandInternal(gvTmp,*V,&TypeGener,&SlotTable,GI->getParent());
+            }
+            else{
+                outs() << "can't cast as value\n";
+            }
             gvTmp<<";\n";
             gvTmp.flush();
+
+            /*
             Helper::Formatting(GVTmp);
             if (GI->hasInitializer())
                 Helper::InitGValue(initProc,GI,&TypeGener,&SlotTable,GI->getParent());
             outs()<<GVTmp;
+            */
         }
     }
-
+    /*
     FunctionGen functionGener(TypeGener,SlotTable,OS,m);
     for (Module::const_iterator FI=m->begin(),FE=m->end();FI!=FE;++FI){
         functionGener.printFunction(FI);

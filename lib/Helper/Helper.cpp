@@ -525,116 +525,116 @@ void Helper::WriteMDNodeBodyInternal(raw_ostream &Out, const MDNode *Node,
   Out << "}";
 }
 
-    
+*/
 
 /// WriteAsOperand - Write the name of the specified value out to the specified
 /// ostream.  This can be useful when you just want to print int %reg126, not
 /// the whole instruction that generated it.
 
 /// this used to take in a Value instead of a Global Variable 
-void Helper::WriteAsOperandInternal(raw_ostream &Out, const GlobalVariable &GV,
-                                   TypeGen *TypePrinter,
-                                   SlotTracker *Machine,
-                                   const Module Context) {
+void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value &V,
+                                    TypeGen *TypePrinter,
+                                    SlotTracker *Machine,
+                                    const Module *Context) {
 
-  if (GV.hasName()) {
-    PrintLLVMName(Out, GV);
-    return;
-  }
+    /*
+    if (GV.hasName()) {
+        PrintLLVMName(Out, GV);
+        return;
+    }
+
+    const Constant CV = dyn_cast<Constant>(*GV);
+    // was getting errors about not being ab;e to convert CV to a bool
+    // if (CV && !isa<GlobalValue>(CV)) {
+    if (!isa<GlobalValue>(CV)) {
+        assert(TypePrinter && "Constants require TypeGen!");
+        WriteConstantInternal(Out, &CV, *TypePrinter, &Machine, *Context);
+        return;
+    }
+
+    if (const InlineAsm IA = dyn_cast<InlineAsm>(*GV)) {
+        Out << "asm ";
+        if (IA.hasSideEffects())
+            Out << "sideeffect ";
+        if (IA.isAlignStack())
+            Out << "alignstack ";
+        Out << '"';
+        PrintEscapedString(IA.getAsmString(), Out);
+        Out << "\", \"";
+        PrintEscapedString(IA.getConstraintString(), Out);
+        Out << '"';
+        return;
+    }
+    // error: can't convert MDNode to bool
+    // if (const MDNode N = dyn_cast<MDNode>(*GV)) {
+    const MDNode N = dyn_cast<MDNode>(*GV)
+        // MDNode no longer has as isFunctionLocal() method 
+        // if (N->isFunctionLocal()) {
+        // Print metadata inline, not via slot reference number.
+        //   WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
+        // return;
+        // }
   
-}
-
-  const Constant CV = dyn_cast<Constant>(*GV);
-  // was getting errors about not being ab;e to convert CV to a bool
-  // if (CV && !isa<GlobalValue>(CV)) {
-  if (!isa<GlobalValue>(CV)) {
-    assert(TypePrinter && "Constants require TypeGen!");
-    WriteConstantInternal(Out, &CV, *TypePrinter, &Machine, *Context);
-    return;
-  }
-
-  if (const InlineAsm IA = dyn_cast<InlineAsm>(*GV)) {
-    Out << "asm ";
-    if (IA.hasSideEffects())
-      Out << "sideeffect ";
-    if (IA.isAlignStack())
-      Out << "alignstack ";
-    Out << '"';
-    PrintEscapedString(IA.getAsmString(), Out);
-    Out << "\", \"";
-    PrintEscapedString(IA.getConstraintString(), Out);
-    Out << '"';
-    return;
-  }
-  // error: can't convert MDNode to bool
-  // if (const MDNode N = dyn_cast<MDNode>(*GV)) {
-  const MDNode N = dyn_cast<MDNode>(*GV)
-    // MDNode no longer has as isFunctionLocal() method 
-    // if (N->isFunctionLocal()) {
-      // Print metadata inline, not via slot reference number.
-      //   WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
-      // return;
-      // }
-  
-      // if (!Machine) {
+        // if (!Machine) {
         // if (N->isFunctionLocal())
         //Machine = new SlotTracker(N->getFunction());
         // else
-    Machine = new SlotTracker(*Context);
-        // }
+        Machine = new SlotTracker(*Context);
+    // }
     int Slot = Machine.getMetadataSlot(N);
     if (Slot == -1)
-      Out << "<badref>";
+        Out << "<badref>";
     else
-      Out << '!' << Slot;
+        Out << '!' << Slot;
     return;
     // }
 
-  if (const MDString MDS = dyn_cast<MDString>(*GV)) {
-    Out << "!\"";
-    PrintEscapedString(MDS.getString(), Out);
-    Out << '"';
-    return;
-  }
-
-  // these types no longer exist
-  // if (GV.getValueID() == Value::PseudoSourceValueVal ||
-  // GV.getValueID() == Value::FixedStackPseudoSourceValueVal) {
-  // GV.print(Out);
-  // return;
-  // }
-
-  char Prefix = 'v';
-  int Slot;
-  if (Machine) {
-    if (const GlobalValue GGV = dyn_cast<GlobalValue>(*GV)) {
-      Slot = Machine->getGlobalSlot(GGV);
-      Prefix = '_';
-    } else {
-      Slot = Machine->getLocalSlot(&GV);
+    if (const MDString MDS = dyn_cast<MDString>(*GV)) {
+        Out << "!\"";
+        PrintEscapedString(MDS.getString(), Out);
+        Out << '"';
+        return;
     }
-  } else {
-    Machine = createSlotTracker(&GV);
+
+    // these types no longer exist
+    // if (GV.getValueID() == Value::PseudoSourceValueVal ||
+    // GV.getValueID() == Value::FixedStackPseudoSourceValueVal) {
+    // GV.print(Out);
+    // return;
+    // }
+
+    char Prefix = 'v';
+    int Slot;
     if (Machine) {
-      if (const GlobalValue GGV = dyn_cast<GlobalValue>(*GV)) {
-        Slot = Machine->getGlobalSlot(GGV);
-        Prefix = '@';
-      } else {
-        Slot = Machine->getLocalSlot(&GV);
-      }
-      delete Machine;
+        if (const GlobalValue GGV = dyn_cast<GlobalValue>(*GV)) {
+            Slot = Machine->getGlobalSlot(GGV);
+            Prefix = '_';
+        } else {
+            Slot = Machine->getLocalSlot(&GV);
+        }
     } else {
-      Slot = -1;
+        Machine = createSlotTracker(&GV);
+        if (Machine) {
+            if (const GlobalValue GGV = dyn_cast<GlobalValue>(*GV)) {
+                Slot = Machine->getGlobalSlot(GGV);
+                Prefix = '@';
+            } else {
+                Slot = Machine->getLocalSlot(&GV);
+            }
+            delete Machine;
+        } else {
+            Slot = -1;
+        }
     }
-  }
 
-  if (Slot != -1)
-    Out << Prefix << Slot;
-  else
-    Out << "<badref>";
+    if (Slot != -1)
+        Out << Prefix << Slot;
+    else
+        Out << "<badref>";
+    */
 }
 
-
+/*
 void Helper::WriteAsOperand(raw_ostream &Out, const Value *V,
                           bool PrintType, const Module *Context) {
 
