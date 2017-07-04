@@ -1,6 +1,7 @@
 Debug/
 build/
 bin/
+tests/
 **#*
 .#*
 ***~
