@@ -210,8 +210,8 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
     }
     
     if (const ConstantFP *CFP = dyn_cast<ConstantFP>(CV)) {
-        if (&CFP->getValueAPF().getSemantics() == &APFloatBase::IEEEdouble() ||
-            &CFP->getValueAPF().getSemantics() == &APFloatBase::IEEEsingle()) {
+        if (&CFP->getValueAPF().getSemantics() == &APFloat::IEEEdouble() ||
+            &CFP->getValueAPF().getSemantics() == &APFloat::IEEEsingle()) {
             // We would like to output the FP constant value in exponential notation,
             // but we cannot do this if doing so will lose precision.  Check here to
             // make sure that we only output it in exponential format if we can parse
@@ -219,9 +219,7 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             //
             bool ignored;
             bool isDouble = &CFP->getValueAPF().getSemantics()==&APFloat::IEEEdouble();
-        }
-    }
-            /*
+            
             double Val = isDouble ? CFP->getValueAPF().convertToDouble() :
                 CFP->getValueAPF().convertToFloat();
             SmallString<128> StrVal;
@@ -246,17 +244,20 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             // x86, so we must not use these types.
             assert(sizeof(double) == sizeof(uint64_t) &&
                    "assuming that double is 64 bits!");
-            char Buffer[40];
+            // char Buffer[40];
             APFloat apf = CFP->getValueAPF();
             // Floats are represented in ASCII IR as double, convert.
             if (!isDouble)
-                apf.convert(APFloat::IEEEdouble, APFloat::rmNearestTiesToEven,
+                apf.convert(APFloat::IEEEdouble(), APFloat::rmNearestTiesToEven,
                             &ignored);
             Out << "0x" <<
-                utohex_buffer(uint64_t(apf.bitcastToAPInt().getZExtValue()),
-                              Buffer+40);
+                utohexstr(uint64_t(apf.bitcastToAPInt().getZExtValue()));
+                // utohex_buffer(uint64_t(apf.bitcastToAPInt().getZExtValue()),
+                //               Buffer+40);
             return;
         }
+    }
+    /*
 
         // Some form of long double.  These appear as a magic letter identifying
         // the type, then a fixed number of hex digits.
