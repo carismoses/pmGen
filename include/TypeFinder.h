@@ -36,8 +36,8 @@ namespace llvm {
         /// inst operands are all explicitly enumerated.
         void IncorporateValue(const Value *V);
 
-        // I think this was originally used to get all types from a module
-        // but llvm 5.0 doesn't have a Module->getTypeSymbolTable function anymore
+        // Get types from all global variables and function identifiers
+        // and add them to TP.TypeNames
         void AddModuleTypesToPrinter(const Module *M);
     };
 

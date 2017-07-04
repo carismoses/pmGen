@@ -1,16 +1,16 @@
 #include "TypeFinder.h"
 #include "TypeGen.h"
+#include "Helper.h"
 #include "llvm/IR/Module.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/FormattedStream.h"
 
 // #include "llvm/ADT/DenseMap.h"
 // #include "llvm/IR/Type.h"
-// #include "Helper.h"
 // #include "llvm/ADT/StringExtras.h"
 // #include "llvm/ADT/STLExtras.h"
 //OLD#include "llvm/TypeSymbolTable.h"
 // #include "llvm/IR/ValueSymbolTable.h"
-// #include "llvm/Support/raw_ostream.h"
-// #include "llvm/Support/FormattedStream.h"
 // #include <cctype>
 
 using namespace llvm;
@@ -114,40 +114,39 @@ void TypeFinder::IncorporateValue(const Value *V) {
 void TypeFinder::AddModuleTypesToPrinter(const Module *M) {
     if (M == 0) return;
 
-    
     // If the module has a symbol table, take all global types and stuff their
     // names into the TypeNames map.
     const ValueSymbolTable &ST = M->getValueSymbolTable();
-    /*
     for (ValueSymbolTable::const_iterator VI = ST.begin(), E = ST.end();
          VI != E; ++VI) {
 
-        // not sure how this isn't throwing an error.
-        // VI-> should be a value, not a type
-        //const Type *Ty = cast<Type>(VI->second);
-        const Type *Ty = VI->second;
-        
+        // get Value from SymbolTableEntry
+        const Value *Val = VI->second; 
+        // get the Type of the Value 
+        const Type *Ty = Val->getType();
+
+        // Possible Optimizations here (from orig developer but syntax has changed):
         // As a heuristic, don't insert pointer to primitive types, because
         // they are used too often to have a single useful name.
-        if (const PointerType *PTy = dyn_cast<PointerType>(Ty)) {
-            const Type *PETy = PTy->getElementType();
-            if ((PETy->isPrimitiveType() || PETy->isIntegerTy()) &&
-                !PETy->isOpaqueTy())
-                continue;
-        }
-
         // Likewise don't insert primitives either.
-        if (Ty->isIntegerTy() || Ty->isPrimitiveType())
-            continue;
+
+        // if (const PointerType *PTy = dyn_cast<PointerType>(Ty)) {
+        //     const Type *PETy = PTy->getElementType();
+        //     if ((PETy->isPrimitiveType() || PETy->isIntegerTy()) &&
+        //         !PETy->isOpaqueTy())
+        //         continue;
+        // }
+        // if (Ty->isIntegerTy() || Ty->isPrimitiveType())
+        //     continue;
 
         // Get the name as a string and insert it into TypeNames.
         std::string NameStr;
         raw_string_ostream NameROS(NameStr);
         formatted_raw_ostream NameOS(NameROS);
-        Helper::PrintLLVMName(NameOS, TI->first, LocalPrefix);
+        // old code printed Type string from TypeSymbolTable,
+        // is that the same as the Value string from the Value symbol table
+        Helper::PrintLLVMName(NameOS, VI->first(), LocalPrefix);
         NameOS.flush();
         TP.addTypeName(Ty, NameStr);
     }
-    */
 }
-
