@@ -30,27 +30,27 @@ using namespace llvm;
 // PrintEscapedString - Print each character of the specified string, escaping
 // it if it is not printable or if it is an escape char.
 void Helper::PrintEscapedString(StringRef Name, raw_ostream &Out) {
-  for (unsigned i = 0, e = Name.size(); i != e; ++i) {
-    unsigned char C = Name[i];
-    if (isprint(C) && C != '\\' && C != '"')
-      Out << C;
-    else
-      Out << '\\' << hexdigit(C >> 4) << hexdigit(C & 0x0F);
-  }
+for (unsigned i = 0, e = Name.size(); i != e; ++i) {
+unsigned char C = Name[i];
+if (isprint(C) && C != '\\' && C != '"')
+Out << C;
+else
+Out << '\\' << hexdigit(C >> 4) << hexdigit(C & 0x0F);
+}
 }
 
 void Helper::test(raw_ostream &OS,StringRef Name){
-	OS<<Name.str();
+OS<<Name.str();
 }
 */
 void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 	assert(Name.data() && "Cannot get empty name!");
 	switch (Prefix) {
-		default: llvm_unreachable("Bad prefix!");
-		case NoPrefix: break;
-		case GlobalPrefix: OS << '_'; break;
-		case LabelPrefix:  break;
-		case LocalPrefix:  break;
+    default: llvm_unreachable("Bad prefix!");
+    case NoPrefix: break;
+    case GlobalPrefix: OS << '_'; break;
+    case LabelPrefix:  break;
+    case LocalPrefix:  break;
 	}
 
 	if (Name[0]>='0' && Name[0]<='9') OS << 'v';
@@ -87,51 +87,50 @@ void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 
 }
 
-/*
 
-void Helper::PrintLLVMName(raw_ostream &OS, const GlobalVariable &GV) {
-	PrintLLVMName(OS, GV.getName(),
-                isa<GlobalValue>(GV) ? GlobalPrefix : LocalPrefix);
+void Helper::PrintLLVMName(raw_ostream &OS, const Value &V) {
+	PrintLLVMName(OS, V.getName(),
+                  isa<GlobalValue>(V) ? GlobalPrefix : LocalPrefix);
 }
 
-
-const Module *Helper::getModuleFromVal(const Value *V) {
+/*
+  const Module *Helper::getModuleFromVal(const Value *V) {
   if (const Argument *MA = dyn_cast<Argument>(V))
-    return MA->getParent() ? MA->getParent()->getParent() : 0;
+  return MA->getParent() ? MA->getParent()->getParent() : 0;
 
   if (const BasicBlock *BB = dyn_cast<BasicBlock>(V))
-    return BB->getParent() ? BB->getParent()->getParent() : 0;
+  return BB->getParent() ? BB->getParent()->getParent() : 0;
 
   if (const Instruction *I = dyn_cast<Instruction>(V)) {
-    const Function *M = I->getParent() ? I->getParent()->getParent() : 0;
-    return M ? M->getParent() : 0;
+  const Function *M = I->getParent() ? I->getParent()->getParent() : 0;
+  return M ? M->getParent() : 0;
   }
   
   if (const GlobalValue *GV = dyn_cast<GlobalValue>(V))
-    return GV->getParent();
+  return GV->getParent();
   return 0;
-}
+  }
 
 
 
-SlotTracker *Helper::createSlotTracker(const Value *V) {
+  SlotTracker *Helper::createSlotTracker(const Value *V) {
   if (const Argument *FA = dyn_cast<Argument>(V))
-    return new SlotTracker(FA->getParent());
+  return new SlotTracker(FA->getParent());
 
   if (const Instruction *I = dyn_cast<Instruction>(V))
-    return new SlotTracker(I->getParent()->getParent());
+  return new SlotTracker(I->getParent()->getParent());
 
   if (const BasicBlock *BB = dyn_cast<BasicBlock>(V))
-    return new SlotTracker(BB->getParent());
+  return new SlotTracker(BB->getParent());
 
   if (const GlobalVariable *GV = dyn_cast<GlobalVariable>(V))
-    return new SlotTracker(*GV->getParent());
+  return new SlotTracker(*GV->getParent());
 
   if (const GlobalAlias *GA = dyn_cast<GlobalAlias>(V))
-    return new SlotTracker(*GA->getParent());
+  return new SlotTracker(*GA->getParent());
 
   if (const Function *Func = dyn_cast<Function>(V))
-    return new SlotTracker(Func);
+  return new SlotTracker(Func);
 
   // MetaData is no longer a subclass of Value
   // (see line 452 of llvm/Metadata.h)
@@ -143,9 +142,9 @@ SlotTracker *Helper::createSlotTracker(const Value *V) {
   // }
 
   return 0;
-}
+  }
 
-const char *Helper::getPredicateText(unsigned predicate) {
+  const char *Helper::getPredicateText(unsigned predicate) {
   const char * pred = "unknown";
   switch (predicate) {
   case FCmpInst::FCMP_FALSE: pred = "false"; break;
@@ -176,14 +175,14 @@ const char *Helper::getPredicateText(unsigned predicate) {
   case ICmpInst::ICMP_ULE:   pred = "<="; break;
   }
   return pred;
-}
+  }
 
 
-void Helper::WriteOptimizationInfo(raw_ostream &Out, const User *U) {
+  void Helper::WriteOptimizationInfo(raw_ostream &Out, const User *U) {
   if (const OverflowingBinaryOperator *OBO =
-        dyn_cast<OverflowingBinaryOperator>(U)) {
-    if (OBO->hasNoUnsignedWrap())
-      Out << " nuw";
+  dyn_cast<OverflowingBinaryOperator>(U)) {
+  if (OBO->hasNoUnsignedWrap())
+  Out << " nuw";
     if (OBO->hasNoSignedWrap())
       Out << " nsw";
   } else if (const PossiblyExactOperator *Div =
@@ -195,313 +194,314 @@ void Helper::WriteOptimizationInfo(raw_ostream &Out, const User *U) {
       Out << " inbounds";
   }
 }
-
-
+*/
 
 void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
-                                  TypeGen &TypePrinter,
-                                  SlotTracker *Machine,
-                                  const Module *Context) {
-    return;
-}
-    
+                                   TypeGen &TypePrinter,
+                                   SlotTracker *Machine,
+                                   const Module *Context) {
     if (const ConstantInt *CI = dyn_cast<ConstantInt>(CV)) {
-    if (CI->getType()->isIntegerTy(1)) {
-      Out << (CI->getZExtValue() ? "true" : "false");
-      return;
-    }
-    Out << CI->getValue();
-    return;
-  }
-
-  if (const ConstantFP *CFP = dyn_cast<ConstantFP>(CV)) {
-    if (&CFP->getValueAPF().getSemantics() == &APFloat::IEEEdouble ||
-        &CFP->getValueAPF().getSemantics() == &APFloat::IEEEsingle) {
-      // We would like to output the FP constant value in exponential notation,
-      // but we cannot do this if doing so will lose precision.  Check here to
-      // make sure that we only output it in exponential format if we can parse
-      // the value back and get the same value.
-      //
-      bool ignored;
-      bool isDouble = &CFP->getValueAPF().getSemantics()==&APFloat::IEEEdouble;
-      double Val = isDouble ? CFP->getValueAPF().convertToDouble() :
-                              CFP->getValueAPF().convertToFloat();
-      SmallString<128> StrVal;
-      raw_svector_ostream(StrVal) << Val;
-
-      // Check to make sure that the stringized number is not some string like
-      // "Inf" or NaN, that atof will accept, but the lexer will not.  Check
-      // that the string matches the "[-+]?[0-9]" regex.
-      //
-      if ((StrVal[0] >= '0' && StrVal[0] <= '9') ||
-          ((StrVal[0] == '-' || StrVal[0] == '+') &&
-           (StrVal[1] >= '0' && StrVal[1] <= '9'))) {
-        // Reparse stringized version!
-        if (atof(StrVal.c_str()) == Val) {
-          Out << StrVal.str();
-          return;
+        if (CI->getType()->isIntegerTy(1)) {
+            Out << (CI->getZExtValue() ? "true" : "false");
+            return;
         }
-      }
-      // Otherwise we could not reparse it to exactly the same value, so we must
-      // output the string in hexadecimal format!  Note that loading and storing
-      // floating point types changes the bits of NaNs on some hosts, notably
-      // x86, so we must not use these types.
-      assert(sizeof(double) == sizeof(uint64_t) &&
-             "assuming that double is 64 bits!");
-      char Buffer[40];
-      APFloat apf = CFP->getValueAPF();
-      // Floats are represented in ASCII IR as double, convert.
-      if (!isDouble)
-        apf.convert(APFloat::IEEEdouble, APFloat::rmNearestTiesToEven,
-                          &ignored);
-      Out << "0x" <<
-              utohex_buffer(uint64_t(apf.bitcastToAPInt().getZExtValue()),
-                            Buffer+40);
-      return;
+        Out << CI->getValue();
+        return;
     }
+    
+    if (const ConstantFP *CFP = dyn_cast<ConstantFP>(CV)) {
+        if (&CFP->getValueAPF().getSemantics() == &APFloatBase::IEEEdouble() ||
+            &CFP->getValueAPF().getSemantics() == &APFloatBase::IEEEsingle()) {
+            // We would like to output the FP constant value in exponential notation,
+            // but we cannot do this if doing so will lose precision.  Check here to
+            // make sure that we only output it in exponential format if we can parse
+            // the value back and get the same value.
+            //
+            bool ignored;
+            bool isDouble = &CFP->getValueAPF().getSemantics()==&APFloat::IEEEdouble();
+        }
+    }
+            /*
+            double Val = isDouble ? CFP->getValueAPF().convertToDouble() :
+                CFP->getValueAPF().convertToFloat();
+            SmallString<128> StrVal;
+            raw_svector_ostream(StrVal) << Val;
 
-    // Some form of long double.  These appear as a magic letter identifying
-    // the type, then a fixed number of hex digits.
-    Out << "0x";
-    if (&CFP->getValueAPF().getSemantics() == &APFloat::x87DoubleExtended) {
-      Out << 'K';
-      // api needed to prevent premature destruction
-      APInt api = CFP->getValueAPF().bitcastToAPInt();
-      const uint64_t* p = api.getRawData();
-      uint64_t word = p[1];
-      int shiftcount=12;
-      int width = api.getBitWidth();
-      for (int j=0; j<width; j+=4, shiftcount-=4) {
-        unsigned int nibble = (word>>shiftcount) & 15;
-        if (nibble < 10)
-          Out << (unsigned char)(nibble + '0');
+            // Check to make sure that the stringized number is not some string like
+            // "Inf" or NaN, that atof will accept, but the lexer will not.  Check
+            // that the string matches the "[-+]?[0-9]" regex.
+            //
+            if ((StrVal[0] >= '0' && StrVal[0] <= '9') ||
+                ((StrVal[0] == '-' || StrVal[0] == '+') &&
+                 (StrVal[1] >= '0' && StrVal[1] <= '9'))) {
+                // Reparse stringized version!
+                if (atof(StrVal.c_str()) == Val) {
+                    Out << StrVal.str();
+                    return;
+                }
+            }
+            // Otherwise we could not reparse it to exactly the same value, so we must
+            // output the string in hexadecimal format!  Note that loading and storing
+            // floating point types changes the bits of NaNs on some hosts, notably
+            // x86, so we must not use these types.
+            assert(sizeof(double) == sizeof(uint64_t) &&
+                   "assuming that double is 64 bits!");
+            char Buffer[40];
+            APFloat apf = CFP->getValueAPF();
+            // Floats are represented in ASCII IR as double, convert.
+            if (!isDouble)
+                apf.convert(APFloat::IEEEdouble, APFloat::rmNearestTiesToEven,
+                            &ignored);
+            Out << "0x" <<
+                utohex_buffer(uint64_t(apf.bitcastToAPInt().getZExtValue()),
+                              Buffer+40);
+            return;
+        }
+
+        // Some form of long double.  These appear as a magic letter identifying
+        // the type, then a fixed number of hex digits.
+        Out << "0x";
+        if (&CFP->getValueAPF().getSemantics() == &APFloat::x87DoubleExtended) {
+            Out << 'K';
+            // api needed to prevent premature destruction
+            APInt api = CFP->getValueAPF().bitcastToAPInt();
+            const uint64_t* p = api.getRawData();
+            uint64_t word = p[1];
+            int shiftcount=12;
+            int width = api.getBitWidth();
+            for (int j=0; j<width; j+=4, shiftcount-=4) {
+                unsigned int nibble = (word>>shiftcount) & 15;
+                if (nibble < 10)
+                    Out << (unsigned char)(nibble + '0');
+                else
+                    Out << (unsigned char)(nibble - 10 + 'A');
+                if (shiftcount == 0 && j+4 < width) {
+                    word = *p;
+                    shiftcount = 64;
+                    if (width-j-4 < 64)
+                        shiftcount = width-j-4;
+                }
+            }
+            return;
+        } else if (&CFP->getValueAPF().getSemantics() == &APFloat::IEEEquad)
+            Out << 'L';
+        else if (&CFP->getValueAPF().getSemantics() == &APFloat::PPCDoubleDouble)
+            Out << 'M';
         else
-          Out << (unsigned char)(nibble - 10 + 'A');
-        if (shiftcount == 0 && j+4 < width) {
-          word = *p;
-          shiftcount = 64;
-          if (width-j-4 < 64)
-            shiftcount = width-j-4;
+            llvm_unreachable("Unsupported floating point type");
+        // api needed to prevent premature destruction
+        APInt api = CFP->getValueAPF().bitcastToAPInt();
+        const uint64_t* p = api.getRawData();
+        uint64_t word = *p;
+        int shiftcount=60;
+        int width = api.getBitWidth();
+        for (int j=0; j<width; j+=4, shiftcount-=4) {
+            unsigned int nibble = (word>>shiftcount) & 15;
+            if (nibble < 10)
+                Out << (unsigned char)(nibble + '0');
+            else
+                Out << (unsigned char)(nibble - 10 + 'A');
+            if (shiftcount == 0 && j+4 < width) {
+                word = *(++p);
+                shiftcount = 64;
+                if (width-j-4 < 64)
+                    shiftcount = width-j-4;
+            }
         }
-      }
-      return;
-    } else if (&CFP->getValueAPF().getSemantics() == &APFloat::IEEEquad)
-      Out << 'L';
-    else if (&CFP->getValueAPF().getSemantics() == &APFloat::PPCDoubleDouble)
-      Out << 'M';
-    else
-      llvm_unreachable("Unsupported floating point type");
-    // api needed to prevent premature destruction
-    APInt api = CFP->getValueAPF().bitcastToAPInt();
-    const uint64_t* p = api.getRawData();
-    uint64_t word = *p;
-    int shiftcount=60;
-    int width = api.getBitWidth();
-    for (int j=0; j<width; j+=4, shiftcount-=4) {
-      unsigned int nibble = (word>>shiftcount) & 15;
-      if (nibble < 10)
-        Out << (unsigned char)(nibble + '0');
-      else
-        Out << (unsigned char)(nibble - 10 + 'A');
-      if (shiftcount == 0 && j+4 < width) {
-        word = *(++p);
-        shiftcount = 64;
-        if (width-j-4 < 64)
-          shiftcount = width-j-4;
-      }
+        return;
     }
-    return;
-  }
 
-  if (isa<ConstantAggregateZero>(CV)) {
-    Out << "zeroinitializer";
-    return;
-  }
+    if (isa<ConstantAggregateZero>(CV)) {
+        Out << "zeroinitializer";
+        return;
+    }
   
-  if (const BlockAddress *BA = dyn_cast<BlockAddress>(CV)) {
-    Out << "blockaddress(";
-    WriteAsOperandInternal(Out, BA->getFunction(), &TypePrinter, Machine,
-                           Context);
-    Out << ", ";
-    WriteAsOperandInternal(Out, BA->getBasicBlock(), &TypePrinter, Machine,
-                           Context);
-    Out << ")";
-    return;
-  }
+    if (const BlockAddress *BA = dyn_cast<BlockAddress>(CV)) {
+        Out << "blockaddress(";
+        WriteAsOperandInternal(Out, BA->getFunction(), &TypePrinter, Machine,
+                               Context);
+        Out << ", ";
+        WriteAsOperandInternal(Out, BA->getBasicBlock(), &TypePrinter, Machine,
+                               Context);
+        Out << ")";
+        return;
+    }
 
-  if (const ConstantArray *CA = dyn_cast<ConstantArray>(CV)) {
-    // As a special case, print the array as a string if it is an array of
-    // i8 with ConstantInt values.
-    //
-    const Type *ETy = CA->getType()->getElementType();
-    if (CA->isString()) {
-      Out << "c\"";
-      PrintEscapedString(CA->getAsString(), Out);
-      Out << '"';
-    } else {                // Cannot output in string format...
-      Out << '[';
-      if (CA->getNumOperands()) {
+    if (const ConstantArray *CA = dyn_cast<ConstantArray>(CV)) {
+        // As a special case, print the array as a string if it is an array of
+        // i8 with ConstantInt values.
+        //
+        const Type *ETy = CA->getType()->getElementType();
+        if (CA->isString()) {
+            Out << "c\"";
+            PrintEscapedString(CA->getAsString(), Out);
+            Out << '"';
+        } else {                // Cannot output in string format...
+            Out << '[';
+            if (CA->getNumOperands()) {
+                TypePrinter.print(ETy, Out);
+                Out << ' ';
+                WriteAsOperandInternal(Out, CA->getOperand(0),
+                                       &TypePrinter, Machine,
+                                       Context);
+                for (unsigned i = 1, e = CA->getNumOperands(); i != e; ++i) {
+                    Out << ", ";
+                    TypePrinter.print(ETy, Out);
+                    Out << ' ';
+                    WriteAsOperandInternal(Out, CA->getOperand(i), &TypePrinter, Machine,
+                                           Context);
+                }
+            }
+            Out << ']';
+        }
+        return;
+    }
+
+    if (const ConstantStruct *CS = dyn_cast<ConstantStruct>(CV)) {
+        if (CS->getType()->isPacked())
+            Out << '<';
+        Out << '{';
+        unsigned N = CS->getNumOperands();
+        if (N) {
+            Out << ' ';
+            TypePrinter.print(CS->getOperand(0)->getType(), Out);
+            Out << ' ';
+
+            WriteAsOperandInternal(Out, CS->getOperand(0), &TypePrinter, Machine,
+                                   Context);
+
+            for (unsigned i = 1; i < N; i++) {
+                Out << ", ";
+                TypePrinter.print(CS->getOperand(i)->getType(), Out);
+                Out << ' ';
+
+                WriteAsOperandInternal(Out, CS->getOperand(i), &TypePrinter, Machine,
+                                       Context);
+            }
+            Out << ' ';
+        }
+
+        Out << '}';
+        if (CS->getType()->isPacked())
+            Out << '>';
+        return;
+    }
+
+    if (const ConstantVector *CP = dyn_cast<ConstantVector>(CV)) {
+        const Type *ETy = CP->getType()->getElementType();
+        assert(CP->getNumOperands() > 0 &&
+               "Number of operands for a PackedConst must be > 0");
+        Out << '<';
         TypePrinter.print(ETy, Out);
         Out << ' ';
-        WriteAsOperandInternal(Out, CA->getOperand(0),
-                               &TypePrinter, Machine,
+        WriteAsOperandInternal(Out, CP->getOperand(0), &TypePrinter, Machine,
                                Context);
-        for (unsigned i = 1, e = CA->getNumOperands(); i != e; ++i) {
-          Out << ", ";
-          TypePrinter.print(ETy, Out);
-          Out << ' ';
-          WriteAsOperandInternal(Out, CA->getOperand(i), &TypePrinter, Machine,
-                                 Context);
+        for (unsigned i = 1, e = CP->getNumOperands(); i != e; ++i) {
+            Out << ", ";
+            TypePrinter.print(ETy, Out);
+            Out << ' ';
+            WriteAsOperandInternal(Out, CP->getOperand(i), &TypePrinter, Machine,
+                                   Context);
         }
-      }
-      Out << ']';
+        Out << '>';
+        return;
     }
-    return;
-  }
 
-  if (const ConstantStruct *CS = dyn_cast<ConstantStruct>(CV)) {
-    if (CS->getType()->isPacked())
-      Out << '<';
-    Out << '{';
-    unsigned N = CS->getNumOperands();
-    if (N) {
-      Out << ' ';
-      TypePrinter.print(CS->getOperand(0)->getType(), Out);
-      Out << ' ';
+    if (isa<ConstantPointerNull>(CV)) {
+        Out << "null";
+        return;
+    }
 
-      WriteAsOperandInternal(Out, CS->getOperand(0), &TypePrinter, Machine,
-                             Context);
+    if (isa<UndefValue>(CV)) {
+        Out << "undef";
+        return;
+    }
 
-      for (unsigned i = 1; i < N; i++) {
-        Out << ", ";
-        TypePrinter.print(CS->getOperand(i)->getType(), Out);
+    if (const ConstantExpr *CE = dyn_cast<ConstantExpr>(CV)) {
+        //Out << CE->getOpcodeName();
         Out << ' ';
+        //WriteOptimizationInfo(Out, CE);
+        //if (CE->isCompare())
+        //  Out << ' ' << getPredicateText(CE->getPredicate());
+        switch (CE->getOpcode()){
+        case GetElementPtr:
+            ConStr conStr;
+            User::const_op_iterator OI=CE->op_begin();
+            User::const_op_iterator OE=CE->op_end();
+            bool isStruct=false;
+            if (conStr.isExist(dyn_cast<Value>(*OI)->getName())){
+                Out<<'"';
+                std::string name=conStr.getString(dyn_cast<Value>(*OI)->getName());
+                Helper::PrintEscapedString(name,Out);
+                Out<<'"'<<' ';
+                return ;
+            }
+            if (cast<PointerType>((*OI)->getType())->getElementType()->getTypeID()==Type::StructTyID) isStruct=true;
+            WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
+            const Type *type=cast<PointerType>((*OI)->getType())->getElementType();
+            OI++;
+            if (isStruct){
+                if (dyn_cast<ConstantInt>(*OI)->getZExtValue()!=0){
+                    Out <<'[';
+                    WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
+                    Out <<']';
+                }
+            }else{
+                //				Out<<'[';
+                //				WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
+                //				Out<<']';
+            }
+            if (OI==OE) return ;
+            for (++OI;OI!=OE;++OI){
+                if (isStruct){
+                    const StructType *STY=cast<StructType>(type);
+                    unsigned num=dyn_cast<ConstantInt>(*OI)->getZExtValue();
+                    type=STY->getElementType(num);
+                    if (type->getTypeID()!=Type::StructTyID) isStruct=false;
+                    Out<<".u"<<num;				
+                }else{
+                    const ArrayType *ATY = cast<ArrayType>(type);
+                    type=ATY->getElementType();
+                    if (type->getTypeID()==Type::StructTyID) isStruct=true;
+                    Out<<'[';
+                    WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
+                    Out<<']';
+                }
+            }
 
-        WriteAsOperandInternal(Out, CS->getOperand(i), &TypePrinter, Machine,
-                               Context);
-      }
-      Out << ' ';
+            return;
+        }
+        Out << CE->getOpcodeName();
+        Out << " (";
+
+        for (User::const_op_iterator OI=CE->op_begin(); OI != CE->op_end(); ++OI) {
+            TypePrinter.print((*OI)->getType(), Out);
+            Out << ' ';
+            WriteAsOperandInternal(Out, *OI, &TypePrinter, Machine, Context);
+            if (OI+1 != CE->op_end())
+                Out << ", ";
+        }
+
+        if (CE->hasIndices()) {
+            const SmallVector<unsigned, 4> &Indices = CE->getIndices();
+            for (unsigned i = 0, e = Indices.size(); i != e; ++i)
+                Out << ", " << Indices[i];
+        }
+
+        if (CE->isCast()) {
+            Out << " to ";
+            TypePrinter.print(CE->getType(), Out);
+        }
+
+        Out << ')';
+        return;
     }
 
-    Out << '}';
-    if (CS->getType()->isPacked())
-      Out << '>';
-    return;
-  }
-
-  if (const ConstantVector *CP = dyn_cast<ConstantVector>(CV)) {
-    const Type *ETy = CP->getType()->getElementType();
-    assert(CP->getNumOperands() > 0 &&
-           "Number of operands for a PackedConst must be > 0");
-    Out << '<';
-    TypePrinter.print(ETy, Out);
-    Out << ' ';
-    WriteAsOperandInternal(Out, CP->getOperand(0), &TypePrinter, Machine,
-                           Context);
-    for (unsigned i = 1, e = CP->getNumOperands(); i != e; ++i) {
-      Out << ", ";
-      TypePrinter.print(ETy, Out);
-      Out << ' ';
-      WriteAsOperandInternal(Out, CP->getOperand(i), &TypePrinter, Machine,
-                             Context);
-    }
-    Out << '>';
-    return;
-  }
-
-  if (isa<ConstantPointerNull>(CV)) {
-    Out << "null";
-    return;
-  }
-
-  if (isa<UndefValue>(CV)) {
-    Out << "undef";
-    return;
-  }
-
-  if (const ConstantExpr *CE = dyn_cast<ConstantExpr>(CV)) {
-    //Out << CE->getOpcodeName();
-	Out << ' ';
-    //WriteOptimizationInfo(Out, CE);
-    //if (CE->isCompare())
-    //  Out << ' ' << getPredicateText(CE->getPredicate());
-	switch (CE->getOpcode()){
-		case GetElementPtr:
-			ConStr conStr;
-			User::const_op_iterator OI=CE->op_begin();
-			User::const_op_iterator OE=CE->op_end();
-			bool isStruct=false;
-			if (conStr.isExist(dyn_cast<Value>(*OI)->getName())){
-				Out<<'"';
-				std::string name=conStr.getString(dyn_cast<Value>(*OI)->getName());
-				Helper::PrintEscapedString(name,Out);
-				Out<<'"'<<' ';
-				return ;
-			}
-			if (cast<PointerType>((*OI)->getType())->getElementType()->getTypeID()==Type::StructTyID) isStruct=true;
-			WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-			const Type *type=cast<PointerType>((*OI)->getType())->getElementType();
-			OI++;
-			if (isStruct){
-				if (dyn_cast<ConstantInt>(*OI)->getZExtValue()!=0){
-					Out <<'[';
-					WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-					Out <<']';
-				}
-			}else{
-//				Out<<'[';
-//				WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-//				Out<<']';
-			}
-			if (OI==OE) return ;
-			for (++OI;OI!=OE;++OI){
-				if (isStruct){
-					const StructType *STY=cast<StructType>(type);
-					unsigned num=dyn_cast<ConstantInt>(*OI)->getZExtValue();
-					type=STY->getElementType(num);
-					if (type->getTypeID()!=Type::StructTyID) isStruct=false;
-					Out<<".u"<<num;				
-				}else{
-					const ArrayType *ATY = cast<ArrayType>(type);
-					type=ATY->getElementType();
-					if (type->getTypeID()==Type::StructTyID) isStruct=true;
-					Out<<'[';
-					WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-					Out<<']';
-				}
-			}
-
-			return;
-	}
-	Out << CE->getOpcodeName();
-    Out << " (";
-
-    for (User::const_op_iterator OI=CE->op_begin(); OI != CE->op_end(); ++OI) {
-      TypePrinter.print((*OI)->getType(), Out);
-      Out << ' ';
-      WriteAsOperandInternal(Out, *OI, &TypePrinter, Machine, Context);
-      if (OI+1 != CE->op_end())
-        Out << ", ";
-    }
-
-    if (CE->hasIndices()) {
-      const SmallVector<unsigned, 4> &Indices = CE->getIndices();
-      for (unsigned i = 0, e = Indices.size(); i != e; ++i)
-        Out << ", " << Indices[i];
-    }
-
-    if (CE->isCast()) {
-      Out << " to ";
-      TypePrinter.print(CE->getType(), Out);
-    }
-
-    Out << ')';
-    return;
-  }
-
-  Out << "<placeholder or erroneous Constant>";
+    Out << "<placeholder or erroneous Constant>";
+            ******************************************************************/
 }
 
+/*
 
 void Helper::WriteMDNodeBodyInternal(raw_ostream &Out, const MDNode *Node,
                                     TypeGen *TypePrinter,
@@ -524,34 +524,28 @@ void Helper::WriteMDNodeBodyInternal(raw_ostream &Out, const MDNode *Node,
   
   Out << "}";
 }
-
 */
 
 /// WriteAsOperand - Write the name of the specified value out to the specified
 /// ostream.  This can be useful when you just want to print int %reg126, not
 /// the whole instruction that generated it.
-
-/// this used to take in a Value instead of a Global Variable 
 void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value &V,
                                     TypeGen *TypePrinter,
                                     SlotTracker *Machine,
                                     const Module *Context) {
+    if (V.hasName()) {
+        PrintLLVMName(Out, V);
+        return;
+    }
+
+    const Constant *CV = dyn_cast<Constant>(&V);
+    if (CV && !isa<GlobalValue>(CV)) {
+        assert(TypePrinter && "Constants require TypeGen!");
+        WriteConstantInternal(Out, CV, *TypePrinter, Machine, Context);
+        return;
+    }
 
     /*
-    if (GV.hasName()) {
-        PrintLLVMName(Out, GV);
-        return;
-    }
-
-    const Constant CV = dyn_cast<Constant>(*GV);
-    // was getting errors about not being ab;e to convert CV to a bool
-    // if (CV && !isa<GlobalValue>(CV)) {
-    if (!isa<GlobalValue>(CV)) {
-        assert(TypePrinter && "Constants require TypeGen!");
-        WriteConstantInternal(Out, &CV, *TypePrinter, &Machine, *Context);
-        return;
-    }
-
     if (const InlineAsm IA = dyn_cast<InlineAsm>(*GV)) {
         Out << "asm ";
         if (IA.hasSideEffects())
@@ -745,4 +739,3 @@ std::string ConStr::getString(const StringRef name){
 ConStr *ConStr::get(){
 	return ConStr::pConStr;
 }
-
