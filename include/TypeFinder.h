@@ -7,13 +7,10 @@
 #include "llvm/IR/Module.h"
 #include "llvm/ADT/DenseSet.h"
 
-//OLD#include "llvm/Assembly/Writer.h"
-//OLD#include "llvm/Module.h"
-//OLD#include "llvm/DerivedTypes.h"
-//OLD#include "llvm/Support/ErrorHandling.h"
-
 namespace llvm {
 
+    /// TypeFinder goes through all module level types, global variables, and BBs->Functions->Instructions
+    /// and finds all Types. It adds them to NumberedTypes and TP
     class TypeFinder {
         // To avoid walking constant expressions multiple times and other IR
         // objects, we keep several helper maps.
@@ -26,8 +23,10 @@ namespace llvm {
         TypeFinder(TypeGen &tp, std::vector<const Type*> &numberedTypes)
             : TP(tp), NumberedTypes(numberedTypes) {}
 
+        /// main function for finding all types at all levels
         void Run(const Module &M);
     private:
+        /// Adds given type to TP and NumberedTypes
         void IncorporateType(const Type *Ty);
 
         /// IncorporateValue - This method is used to walk operand lists finding

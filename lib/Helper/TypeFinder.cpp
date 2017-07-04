@@ -6,13 +6,6 @@
 #include "llvm/Support/FormattedStream.h"
 #include "llvm/ADT/StringExtras.h"
 
-// #include "llvm/ADT/DenseMap.h"
-// #include "llvm/IR/Type.h"
-// #include "llvm/ADT/STLExtras.h"
-//OLD#include "llvm/TypeSymbolTable.h"
-// #include "llvm/IR/ValueSymbolTable.h"
-// #include <cctype>
-
 using namespace llvm;
 
 void TypeFinder::Run(const Module &M) {
@@ -25,13 +18,6 @@ void TypeFinder::Run(const Module &M) {
            VI != E; ++VI)
         // IncorporateType(TI->second);
         IncorporateValue(VI->second);
-    /*
-    // change from incorporate type (from TypeSymbolTable) to incorporate value
-    // (from ValueSymbolTable)
-    const ValueSymbolTable &ST = M.getValueSymbolTable();
-    for (ValueSymbolTable::const_iterator VI = ST.begin(), E = ST.end();
-         VI != E; ++VI)
-        IncorporateValue(VI->second);
     
     // Get types from global variables.
     for (Module::const_global_iterator I = M.global_begin(),
@@ -40,14 +26,14 @@ void TypeFinder::Run(const Module &M) {
         if (I->hasInitializer())
             IncorporateValue(I->getInitializer());
     }
-
+    
     // Get types from aliases.
     for (Module::const_alias_iterator I = M.alias_begin(),
              E = M.alias_end(); I != E; ++I) {
         IncorporateType(I->getType());
         IncorporateValue(I->getAliasee());
     }
-
+    
     // Get types from functions.
     // function iterator
     for (Module::const_iterator FI = M.begin(), E = M.end(); FI != E; ++FI) {
@@ -65,7 +51,6 @@ void TypeFinder::Run(const Module &M) {
                     IncorporateValue(*OI);
             }
     }
-    */
 }
 
 void TypeFinder::IncorporateType(const Type *Ty) {
@@ -88,12 +73,7 @@ void TypeFinder::IncorporateType(const Type *Ty) {
 }
 
 // now using this instead of IncorporateType since Module returns a
-// ValueSYmbolTable instead of a TypeSymbolTable
-
-/// IncorporateValue - This method is used to walk operand lists finding
-/// types hiding in constant expressions and other operands that won't be
-/// walked in other ways.  GlobalValues, basic blocks, instructions, and
-/// inst operands are all explicitly enumerated.
+// ValueSYmbolTable instead of a TypeSymbolTable 
 void TypeFinder::IncorporateValue(const Value *V) {
     // might need to delete this since no longe rusing IncorporateType()
     // directly from module Type (now Value) SymbolTable
