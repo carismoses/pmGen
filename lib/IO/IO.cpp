@@ -4,10 +4,6 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IRReader/IRReader.h"
 
-// #include "llvm/AsmParser/Parser.h"
-//OLD#include "llvm/Support/IRReader.h"
-// #include "llvm/Support/raw_ostream.h"
-
 using namespace std;
 
 std::unique_ptr<Module> parseModule(std::string InputFileName,LLVMContext &Context){
