@@ -1,5 +1,6 @@
 #include "Helper.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Constants.h"
 #include <string>
@@ -11,7 +12,6 @@
 // #include "llvm/IR/DerivedTypes.h"
 // #include "llvm/IR/InlineAsm.h"
 // #include "llvm/IR/Operator.h"
-// #include "llvm/ADT/StringExtras.h"
 // #include "llvm/Support/raw_ostream.h"
 // #include "llvm/ADT/StringRef.h"
 // #include "llvm/IR/Metadata.h"
@@ -256,13 +256,11 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                 //               Buffer+40);
             return;
         }
-    }
-    /*
-
+        
         // Some form of long double.  These appear as a magic letter identifying
         // the type, then a fixed number of hex digits.
         Out << "0x";
-        if (&CFP->getValueAPF().getSemantics() == &APFloat::x87DoubleExtended) {
+        if (&CFP->getValueAPF().getSemantics() == &APFloat::x87DoubleExtended()) {
             Out << 'K';
             // api needed to prevent premature destruction
             APInt api = CFP->getValueAPF().bitcastToAPInt();
@@ -284,9 +282,9 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                 }
             }
             return;
-        } else if (&CFP->getValueAPF().getSemantics() == &APFloat::IEEEquad)
+        } else if (&CFP->getValueAPF().getSemantics() == &APFloat::IEEEquad())
             Out << 'L';
-        else if (&CFP->getValueAPF().getSemantics() == &APFloat::PPCDoubleDouble)
+        else if (&CFP->getValueAPF().getSemantics() == &APFloat::PPCDoubleDouble())
             Out << 'M';
         else
             llvm_unreachable("Unsupported floating point type");
@@ -319,10 +317,10 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
   
     if (const BlockAddress *BA = dyn_cast<BlockAddress>(CV)) {
         Out << "blockaddress(";
-        WriteAsOperandInternal(Out, BA->getFunction(), &TypePrinter, Machine,
+        WriteAsOperandInternal(Out, *BA->getFunction(), &TypePrinter, Machine,
                                Context);
         Out << ", ";
-        WriteAsOperandInternal(Out, BA->getBasicBlock(), &TypePrinter, Machine,
+        WriteAsOperandInternal(Out, *BA->getBasicBlock(), &TypePrinter, Machine,
                                Context);
         Out << ")";
         return;
@@ -342,14 +340,14 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             if (CA->getNumOperands()) {
                 TypePrinter.print(ETy, Out);
                 Out << ' ';
-                WriteAsOperandInternal(Out, CA->getOperand(0),
+                WriteAsOperandInternal(Out, *CA->getOperand(0),
                                        &TypePrinter, Machine,
                                        Context);
                 for (unsigned i = 1, e = CA->getNumOperands(); i != e; ++i) {
                     Out << ", ";
                     TypePrinter.print(ETy, Out);
                     Out << ' ';
-                    WriteAsOperandInternal(Out, CA->getOperand(i), &TypePrinter, Machine,
+                    WriteAsOperandInternal(Out, *CA->getOperand(i), &TypePrinter, Machine,
                                            Context);
                 }
             }
@@ -357,6 +355,7 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
         }
         return;
     }
+    /*
 
     if (const ConstantStruct *CS = dyn_cast<ConstantStruct>(CV)) {
         if (CS->getType()->isPacked())
