@@ -167,51 +167,57 @@ break;
 
 TypeStack.pop_back();       // Remove self from stack.
 }
-
+*/
 /// printTypeInt - The internal guts of printing out a type that has a
 /// potentially named portion.
 ///
 void TypeGen::print(const Type *Ty, raw_ostream &OS,
-bool IgnoreTopLevelName) {
-// Check to see if the type is named.
-DenseMap<const Type*, std::string> &TM = getTypeNamesMap(TypeNames);
-if (!IgnoreTopLevelName) {
-DenseMap<const Type*, std::string>::iterator I = TM.find(Ty);
-if (I != TM.end()) {
-OS << I->second;
-return;
-}
-}
+                    bool IgnoreTopLevelName) {
+    /*
+    // Check to see if the type is named.
+    //DenseMap<const Type*, std::string> &TM = getTypeNamesMap(TypeNames);
+    
+    if (!IgnoreTopLevelName) {
+        DenseMap<const Type*, std::string>::iterator I = TM.find(Ty);
+        if (I != TM.end()) {
+            OS << I->second;
+            return;
+        }
+    }
+   
+    // Otherwise we have a type that has not been named but is a derived type.
+    // Carefully recurse the type hierarchy to print out any contained symbolic
+    // names.
+    SmallVector<const Type *, 16> TypeStack;
+    std::string TypeName;
 
-// Otherwise we have a type that has not been named but is a derived type.
-// Carefully recurse the type hierarchy to print out any contained symbolic
-// names.
-SmallVector<const Type *, 16> TypeStack;
-std::string TypeName;
+    raw_string_ostream TypeOS(TypeName);
+    CalcTypeName(Ty, TypeStack, TypeOS, IgnoreTopLevelName);
+    OS << TypeOS.str();
 
-raw_string_ostream TypeOS(TypeName);
-CalcTypeName(Ty, TypeStack, TypeOS, IgnoreTopLevelName);
-OS << TypeOS.str();
-
-// Cache type name for later use.
-if (!IgnoreTopLevelName)
-TM.insert(std::make_pair(Ty, TypeOS.str()));
+    // Cache type name for later use.
+    if (!IgnoreTopLevelName)
+        TM.insert(std::make_pair(Ty, TypeOS.str()));
+    */
+    return;
 }
 
 void TypeGen::gen(std::vector<const Type*> numberedTypes,const ValueSymbolTable &ST,raw_ostream &OS){
-const Type *type;
-//Emit all numbered types.
-for (int NI=0,NE=numberedTypes.size();NI!=NE;++NI){
-type=numberedTypes[NI];
-this->printAtLeastOneLevel(type,OS);
-OS<<'\n';
-}
+    const Type *type;
 
-//Print the named types.
-// NEED TO FIX, now that values are returned, not types
-// for (ValueSymbolTable::const_iterator TI=ST.begin(),TE=ST.end();TI!=TE;++TI){
-// 	this->printAtLeastOneLevel(TI->second,OS);
-// 	OS<<'\n';
-// }
+    // not sure what the difference between numbered and named types is
+    // why are types from the symbol table named??
+
+    //Emit all numbered types.
+    for (int NI=0,NE=numberedTypes.size();NI!=NE;++NI){
+        type=numberedTypes[NI];
+        this->printAtLeastOneLevel(type,OS);
+        OS<<'\n';
+    }
+
+    //Print the named types.
+    for (ValueSymbolTable::const_iterator VI=ST.begin(),VE=ST.end();VI!=VE;++VI){
+        this->printAtLeastOneLevel(VI->second->getType(),OS);
+     	OS<<'\n';
+    }
 }
-*/
