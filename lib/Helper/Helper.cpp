@@ -67,23 +67,23 @@ void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 			char C = Name[i];
 			if (!isalnum(C) && C != '-' && C != '.' && C != '_') {
 				NeedsQuotes = true;
-
 				break;
 			}
 		}
 	}
 
+    // below was commented out by original developer
 	// If we didn't need any quotes, just write out the name in one blast.
-//	if (!NeedsQuotes) {
-//		OS << Name;
-//		return;
-//	}
+    //	if (!NeedsQuotes) {
+    //		OS << Name;
+    //		return;
+    //	}
 
 	// Okay, we need quotes.  Output the quotes and escape any scary characters as
 	// needed.
-//	OS << '"';
-//	PrintEscapedString(Name, OS);
-//	OS << '"';
+    //	OS << '"';
+    //	PrintEscapedString(Name, OS);
+    //	OS << '"';
 
 }
 
