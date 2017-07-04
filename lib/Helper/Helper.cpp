@@ -357,7 +357,6 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
         }
         return;
     }
-    /*
 
     if (const ConstantStruct *CS = dyn_cast<ConstantStruct>(CV)) {
         if (CS->getType()->isPacked())
@@ -369,15 +368,15 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             TypePrinter.print(CS->getOperand(0)->getType(), Out);
             Out << ' ';
 
-            WriteAsOperandInternal(Out, CS->getOperand(0), &TypePrinter, Machine,
+            WriteAsOperandInternal(Out, *CS->getOperand(0), &TypePrinter, Machine,
                                    Context);
-
+            
             for (unsigned i = 1; i < N; i++) {
                 Out << ", ";
                 TypePrinter.print(CS->getOperand(i)->getType(), Out);
                 Out << ' ';
 
-                WriteAsOperandInternal(Out, CS->getOperand(i), &TypePrinter, Machine,
+                WriteAsOperandInternal(Out, *CS->getOperand(i), &TypePrinter, Machine,
                                        Context);
             }
             Out << ' ';
@@ -396,13 +395,13 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
         Out << '<';
         TypePrinter.print(ETy, Out);
         Out << ' ';
-        WriteAsOperandInternal(Out, CP->getOperand(0), &TypePrinter, Machine,
+        WriteAsOperandInternal(Out, *CP->getOperand(0), &TypePrinter, Machine,
                                Context);
         for (unsigned i = 1, e = CP->getNumOperands(); i != e; ++i) {
             Out << ", ";
             TypePrinter.print(ETy, Out);
             Out << ' ';
-            WriteAsOperandInternal(Out, CP->getOperand(i), &TypePrinter, Machine,
+            WriteAsOperandInternal(Out, *CP->getOperand(i), &TypePrinter, Machine,
                                    Context);
         }
         Out << '>';
@@ -432,6 +431,10 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             User::const_op_iterator OE=CE->op_end();
             bool isStruct=false;
             if (conStr.isExist(dyn_cast<Value>(*OI)->getName())){
+            }
+        }
+    }
+    /*
                 Out<<'"';
                 std::string name=conStr.getString(dyn_cast<Value>(*OI)->getName());
                 Helper::PrintEscapedString(name,Out);
@@ -727,7 +730,6 @@ bool ConStr::isConStr(const GlobalVariable &V){
     return false;
 }
 
-/*
 bool ConStr::isExist(const StringRef name){
 	if (get()->conStr.find(name)!=get()->conStr.end()) return true;
 	else return false;
@@ -736,7 +738,6 @@ bool ConStr::isExist(const StringRef name){
 std::string ConStr::getString(const StringRef name){
 	return get()->conStr.find(name)->second;
 }
-*/
 
 ConStr *ConStr::get(){
 	return ConStr::pConStr;
