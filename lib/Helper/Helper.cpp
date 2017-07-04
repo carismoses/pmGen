@@ -3,6 +3,7 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Constants.h"
+#include "llvm/IR/Instructions.h"
 #include <string>
 
 // #include "SlotTracker.h"
@@ -15,7 +16,6 @@
 // #include "llvm/Support/raw_ostream.h"
 // #include "llvm/ADT/StringRef.h"
 // #include "llvm/IR/Metadata.h"
-// #include "llvm/IR/Instructions.h"
 // #include "llvm/ADT/APFloat.h"
 // #include "llvm/IR/Constant.h"
 //OLD#include "llvm/Assembly/Writer.h"
@@ -425,16 +425,12 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
         //if (CE->isCompare())
         //  Out << ' ' << getPredicateText(CE->getPredicate());
         switch (CE->getOpcode()){
-        case GetElementPtr:
+        case Instruction::GetElementPtr:
             ConStr conStr;
             User::const_op_iterator OI=CE->op_begin();
             User::const_op_iterator OE=CE->op_end();
             bool isStruct=false;
             if (conStr.isExist(dyn_cast<Value>(*OI)->getName())){
-            }
-        }
-    }
-    /*
                 Out<<'"';
                 std::string name=conStr.getString(dyn_cast<Value>(*OI)->getName());
                 Helper::PrintEscapedString(name,Out);
@@ -442,39 +438,45 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                 return ;
             }
             if (cast<PointerType>((*OI)->getType())->getElementType()->getTypeID()==Type::StructTyID) isStruct=true;
-            WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-            const Type *type=cast<PointerType>((*OI)->getType())->getElementType();
-            OI++;
-            if (isStruct){
-                if (dyn_cast<ConstantInt>(*OI)->getZExtValue()!=0){
-                    Out <<'[';
-                    WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-                    Out <<']';
-                }
-            }else{
-                //				Out<<'[';
-                //				WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-                //				Out<<']';
-            }
-            if (OI==OE) return ;
-            for (++OI;OI!=OE;++OI){
-                if (isStruct){
-                    const StructType *STY=cast<StructType>(type);
-                    unsigned num=dyn_cast<ConstantInt>(*OI)->getZExtValue();
-                    type=STY->getElementType(num);
-                    if (type->getTypeID()!=Type::StructTyID) isStruct=false;
-                    Out<<".u"<<num;				
-                }else{
-                    const ArrayType *ATY = cast<ArrayType>(type);
-                    type=ATY->getElementType();
-                    if (type->getTypeID()==Type::StructTyID) isStruct=true;
-                    Out<<'[';
-                    WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-                    Out<<']';
-                }
-            }
 
-            return;
+            if (const Value* OIVal = dyn_cast<Value>(OI)){
+                WriteAsOperandInternal(Out,*OIVal,&TypePrinter,Machine,Context);
+            
+                const Type *type=cast<PointerType>((*OI)->getType())->getElementType();
+                OI++;
+                if (isStruct){
+                    if (dyn_cast<ConstantInt>(*OI)->getZExtValue()!=0){
+                        Out <<'[';
+                        WriteAsOperandInternal(Out,*OIVal,&TypePrinter,Machine,Context);
+                        Out <<']';
+                    }
+                }else{
+                    //				Out<<'[';
+                    //				WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
+                    //				Out<<']';
+                }
+                if (OI==OE) return ;
+                for (++OI;OI!=OE;++OI){
+                    if (isStruct){
+                        const StructType *STY=cast<StructType>(type);
+                        unsigned num=dyn_cast<ConstantInt>(*OI)->getZExtValue();
+                        type=STY->getElementType(num);
+                        if (type->getTypeID()!=Type::StructTyID) isStruct=false;
+                        Out<<".u"<<num;				
+                    }else{
+                        const ArrayType *ATY = cast<ArrayType>(type);
+                        type=ATY->getElementType();
+                        if (type->getTypeID()==Type::StructTyID) isStruct=true;
+                        Out<<'[';
+                        WriteAsOperandInternal(Out,*OIVal,&TypePrinter,Machine,Context);
+                        Out<<']';
+                    }
+                }
+                return;
+            }
+            else{
+                errs() << "Not able to cast User as Value Type\n";
+            }
         }
         Out << CE->getOpcodeName();
         Out << " (";
@@ -482,13 +484,14 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
         for (User::const_op_iterator OI=CE->op_begin(); OI != CE->op_end(); ++OI) {
             TypePrinter.print((*OI)->getType(), Out);
             Out << ' ';
-            WriteAsOperandInternal(Out, *OI, &TypePrinter, Machine, Context);
+            const Value* OIVal = dyn_cast<Value>(OI);
+            WriteAsOperandInternal(Out, *OIVal, &TypePrinter, Machine, Context);
             if (OI+1 != CE->op_end())
                 Out << ", ";
         }
 
         if (CE->hasIndices()) {
-            const SmallVector<unsigned, 4> &Indices = CE->getIndices();
+            const ArrayRef<unsigned int> &Indices = CE->getIndices();
             for (unsigned i = 0, e = Indices.size(); i != e; ++i)
                 Out << ", " << Indices[i];
         }
@@ -503,19 +506,18 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
     }
 
     Out << "<placeholder or erroneous Constant>";
-            ******************************************************************/
 }
 
 /*
 
-void Helper::WriteMDNodeBodyInternal(raw_ostream &Out, const MDNode *Node,
-                                    TypeGen *TypePrinter,
-                                    SlotTracker *Machine,
-                                    const Module *Context) {
+  void Helper::WriteMDNodeBodyInternal(raw_ostream &Out, const MDNode *Node,
+  TypeGen *TypePrinter,
+  SlotTracker *Machine,
+  const Module *Context) {
   Out << "!{";
   for (unsigned mi = 0, me = Node->getNumOperands(); mi != me; ++mi) {
-    const Value *V = Node->getOperand(mi);
-    if (V == 0)
+  const Value *V = Node->getOperand(mi);
+  if (V == 0)
       Out << "null";
     else {
       TypePrinter->print(V->getType(), Out);
