@@ -330,12 +330,15 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
         // As a special case, print the array as a string if it is an array of
         // i8 with ConstantInt values.
         //
-        const Type *ETy = CA->getType()->getElementType();
-        if (CA->isString()) {
+        
+        // now only type ConstantDataSequential can use isString()
+        const ConstantDataSequential *CDS=dyn_cast<ConstantDataSequential>(CA);
+        if (CDS->isString()) {
             Out << "c\"";
-            PrintEscapedString(CA->getAsString(), Out);
+            PrintEscapedString(CDS->getAsString(), Out);
             Out << '"';
         } else {                // Cannot output in string format...
+            const Type *ETy = CA->getType()->getElementType();
             Out << '[';
             if (CA->getNumOperands()) {
                 TypePrinter.print(ETy, Out);
