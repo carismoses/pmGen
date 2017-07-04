@@ -1,6 +1,7 @@
 #include "Helper.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/IR/Constants.h"
 #include <string>
 
 // #include "SlotTracker.h"
@@ -16,7 +17,6 @@
 // #include "llvm/IR/Metadata.h"
 // #include "llvm/IR/Instructions.h"
 // #include "llvm/ADT/APFloat.h"
-// #include "llvm/IR/Constants.h"
 // #include "llvm/IR/Constant.h"
 //OLD#include "llvm/Assembly/Writer.h"
 //OLD#include "llvm/Module.h"
@@ -714,23 +714,24 @@ void Helper::Formatting(std::string &s){
 	for (i=st;i<=ed;i++) s[j++]=tmp[i];
 	return ;
 }
+*/
 
-
+// this is the only place that sets the pConStr pointer
 ConStr *ConStr::pConStr=new ConStr();
+
 bool ConStr::isConStr(const GlobalVariable &V){
-	if (V.hasInitializer()){
-        // the ConstantArray type no longer had the necessary functions
-		//const ConstantArray *CA=dyn_cast<ConstantArray>(V.getInitializer());
+    if (V.hasInitializer()){
+        // now only type ConstantDataSequential can use isString()
         const ConstantDataSequential *CDS=dyn_cast<ConstantDataSequential>(V.getInitializer());
-		if (CDS && CDS->isString()){
-			get()->conStr.insert(std::pair<StringRef,std::string>(V.getName(),CDS->getAsString()));
-			return true;
-		}
-	}
-	return false;
+        if (CDS && CDS->isString()){
+            get()->conStr.insert(std::pair<StringRef,std::string>(V.getName(),CDS->getAsString()));
+            return true;
+        }
+    }
+    return false;
 }
 
-
+/*
 bool ConStr::isExist(const StringRef name){
 	if (get()->conStr.find(name)!=get()->conStr.end()) return true;
 	else return false;
@@ -739,9 +740,9 @@ bool ConStr::isExist(const StringRef name){
 std::string ConStr::getString(const StringRef name){
 	return get()->conStr.find(name)->second;
 }
+*/
 
 ConStr *ConStr::get(){
 	return ConStr::pConStr;
 }
-*/
 
