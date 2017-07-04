@@ -26,23 +26,22 @@
 
 using namespace llvm;
 
-/*
 // PrintEscapedString - Print each character of the specified string, escaping
 // it if it is not printable or if it is an escape char.
 void Helper::PrintEscapedString(StringRef Name, raw_ostream &Out) {
-for (unsigned i = 0, e = Name.size(); i != e; ++i) {
-unsigned char C = Name[i];
-if (isprint(C) && C != '\\' && C != '"')
-Out << C;
-else
-Out << '\\' << hexdigit(C >> 4) << hexdigit(C & 0x0F);
-}
+    for (unsigned i = 0, e = Name.size(); i != e; ++i) {
+        unsigned char C = Name[i];
+        if (isprint(C) && C != '\\' && C != '"')
+            Out << C;
+        else
+            Out << '\\' << hexdigit(C >> 4) << hexdigit(C & 0x0F);
+    }
 }
 
 void Helper::test(raw_ostream &OS,StringRef Name){
-OS<<Name.str();
+    OS<<Name.str();
 }
-*/
+
 void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 	assert(Name.data() && "Cannot get empty name!");
 	switch (Prefix) {
