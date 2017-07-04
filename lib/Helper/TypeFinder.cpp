@@ -4,10 +4,10 @@
 #include "llvm/IR/Module.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/FormattedStream.h"
+#include "llvm/ADT/StringExtras.h"
 
 // #include "llvm/ADT/DenseMap.h"
 // #include "llvm/IR/Type.h"
-// #include "llvm/ADT/StringExtras.h"
 // #include "llvm/ADT/STLExtras.h"
 //OLD#include "llvm/TypeSymbolTable.h"
 // #include "llvm/IR/ValueSymbolTable.h"
@@ -18,14 +18,14 @@ using namespace llvm;
 void TypeFinder::Run(const Module &M) {
     AddModuleTypesToPrinter(&M);
 
-    /*
-    // Get types from the type symbol table.  This gets opaque types referened
-    // only through derived named types.
+    // Get types from the Value (previously type) symbol table.  This gets opaque types referened
+    // only through derived named types -- not sure if this is still true.
     const ValueSymbolTable &ST = M.getValueSymbolTable();
-    for (ValueSymbolTable::cgonst_iterator TI = ST.begin(), E = ST.end();
-           TI != E; ++TI)
-        IncorporateType(TI->second);
-
+    for (ValueSymbolTable::const_iterator VI = ST.begin(), E = ST.end();
+           VI != E; ++VI)
+        // IncorporateType(TI->second);
+        IncorporateValue(VI->second);
+    /*
     // change from incorporate type (from TypeSymbolTable) to incorporate value
     // (from ValueSymbolTable)
     const ValueSymbolTable &ST = M.getValueSymbolTable();
@@ -68,15 +68,13 @@ void TypeFinder::Run(const Module &M) {
     */
 }
 
-/*
 void TypeFinder::IncorporateType(const Type *Ty) {
     // Check to see if we're already visited this type.
     if (!VisitedTypes.insert(Ty).second)
         return;
 
-    // If this is a structure or opaque type, add a name for the type.
-    // now only struct types can be opaque
-    // changing to just if structure, now only structs can be opaque
+    // If this is a structure or opaque type, add a name for the type
+    // caris: changing to just if structure since now only structs can be opaque
     if (Ty->isStructTy() && cast<StructType>(Ty)->getNumElements()) {
         //|| Ty->isOpaqueTy()) && !TP.hasTypeName(Ty)) {
         TP.addTypeName(Ty, "n_"+utostr(unsigned(NumberedTypes.size())));
@@ -89,11 +87,16 @@ void TypeFinder::IncorporateType(const Type *Ty) {
         IncorporateType(*I);
 }
 
+// now using this instead of IncorporateType since Module returns a
+// ValueSYmbolTable instead of a TypeSymbolTable
+
 /// IncorporateValue - This method is used to walk operand lists finding
 /// types hiding in constant expressions and other operands that won't be
 /// walked in other ways.  GlobalValues, basic blocks, instructions, and
 /// inst operands are all explicitly enumerated.
 void TypeFinder::IncorporateValue(const Value *V) {
+    // might need to delete this since no longe rusing IncorporateType()
+    // directly from module Type (now Value) SymbolTable
     if (V == 0 || !isa<Constant>(V) || isa<GlobalValue>(V)) return;
 
     // Already visited?
@@ -109,7 +112,6 @@ void TypeFinder::IncorporateValue(const Value *V) {
              E = C->op_end(); I != E;++I)
         IncorporateValue(*I);
 }
-*/
 
 void TypeFinder::AddModuleTypesToPrinter(const Module *M) {
     if (M == 0) return;
