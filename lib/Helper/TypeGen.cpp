@@ -59,7 +59,6 @@ void TypeGen::CalcTypeName(
         }
     }
 
-    /*
     // Check to see if the Type is already on the stack...
     unsigned Slot = 0, CurSize = TypeStack.size();
     while (Slot < CurSize && TypeStack[Slot] != Ty) ++Slot; // Scan for type
@@ -96,15 +95,18 @@ void TypeGen::CalcTypeName(
         break;
     }
     case Type::FunctionTyID: {
+        // get type name of return type from function
         const FunctionType *FTy = cast<FunctionType>(Ty);
         CalcTypeName(FTy->getReturnType(), TypeStack, OS);
         OS << " (";
+        // get name of param types for params from function
         for (FunctionType::param_iterator I = FTy->param_begin(),
                  E = FTy->param_end(); I != E; ++I) {
             if (I != FTy->param_begin())
                 OS << ", ";
             CalcTypeName(*I, TypeStack, OS);
         }
+        // if function takes a variable number of arguments
         if (FTy->isVarArg()) {
             if (FTy->getNumParams()) OS << ", ";
             OS << "...";
@@ -162,11 +164,11 @@ void TypeGen::CalcTypeName(
         OS << "<unrecognized-type>";
         break;
     }
-
-    
+    // Types that may need to be added to this swith:
+    // - TokenTyID
+    // - HalfTyID
 
     TypeStack.pop_back();       // Remove self from stack.
-    */
 }
 
 /// printTypeInt - The internal guts of printing out a type that has a
