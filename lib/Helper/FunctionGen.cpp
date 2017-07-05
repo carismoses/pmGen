@@ -3,6 +3,8 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/InstrTypes.h"
 #include "llvm/Support/FormattedStream.h"
 
 /* caris
@@ -315,7 +317,7 @@ void FunctionGen::printInstruction(const Instruction &I) {
 	std::string name2;
 	if (I.hasName()){
 		name=I.getName().str();
-		for (int k=0;k<name.size();k++)
+		for (uint k=0;k<name.size();k++)
 			if (name[k]=='.') name[k]='_';
 	}else if(!I.getType()->isVoidTy()){
 		int SlotNum=Machine.getLocalSlot(&I);
@@ -353,11 +355,11 @@ void FunctionGen::printInstruction(const Instruction &I) {
 	if (const CallInst *CI = dyn_cast<CallInst>(&I)) {
 		if (CI->getCalledValue()->getName()!="printf")
 			Out <<"run ";
-        // uncomment !!!	goto flag1;
+        goto flag1;
 	}
 	if (I.hasName() || !I.getType()->isVoidTy())
         Out <<name<<" = ";
-    // uncomment!!!  flag1:
+ flag1:
   // Print out name if it exists...
 /*
   if (I.hasName()) {
@@ -384,7 +386,6 @@ void FunctionGen::printInstruction(const Instruction &I) {
 */
   // Print out the opcode...
 //  Out << I.getOpcodeName();
-/* caris
   std::string opcodeName = I.getOpcodeName();
 
   // Print out optimization information.
@@ -397,97 +398,97 @@ void FunctionGen::printInstruction(const Instruction &I) {
   // Special case conditional branches to swizzle the condition out to the front
   if (isa<BranchInst>(I)) {
 	  if (cast<BranchInst>(I).isConditional()){
-		BranchInst &BI(cast<BranchInst>(I));
-		Out << "if\n    ::(";
-		writeOperand(BI.getCondition(), false);
-		Out << "!= 0) -> goto Label";
-		Out << gos.find(BI.getSuccessor(0)->getName())->second;
-		//writeOperand(BI.getSuccessor(0), false);
-		Out << "\n    ::(";
-		writeOperand(BI.getCondition(), false);
-		Out << "==0) -> goto Label";
-		Out << gos.find(BI.getSuccessor(1)->getName())->second;
-		//writeOperand(BI.getSuccessor(1), false);
-		Out << "\n  fi";
+          const BranchInst &BI(cast<BranchInst>(I));
+          Out << "if\n    ::(";
+          writeOperand(BI.getCondition(), false);
+          Out << "!= 0) -> goto Label";
+          Out << gos.find(BI.getSuccessor(0)->getName())->second;
+          //writeOperand(BI.getSuccessor(0), false);
+          Out << "\n    ::(";
+          writeOperand(BI.getCondition(), false);
+          Out << "==0) -> goto Label";
+          Out << gos.find(BI.getSuccessor(1)->getName())->second;
+          //writeOperand(BI.getSuccessor(1), false);
+          Out << "\n  fi";
 	  }else{
-		  BranchInst &BI(cast<BranchInst>(I));
+		  const BranchInst &BI(cast<BranchInst>(I));
 		  Out <<"goto Label"<<gos.find(BI.getSuccessor(0)->getName())->second;
 	  }
   } else if (isa<SwitchInst>(I)) {
-    // Special case switch instruction to get formatting nice and correct.
-    Out << ' ';
-    writeOperand(Operand        , true);
-    Out << ", ";
-    writeOperand(I.getOperand(1), true);
-    Out << " [";
-
-    for (unsigned op = 2, Eop = I.getNumOperands(); op < Eop; op += 2) {
-      Out << "\n    ";
-      writeOperand(I.getOperand(op  ), true);
+      // Special case switch instruction to get formatting nice and correct.
+      Out << ' ';
+      writeOperand(Operand        , true);
       Out << ", ";
-      writeOperand(I.getOperand(op+1), true);
-    }
-    Out << "\n  ]";
+      writeOperand(I.getOperand(1), true);
+      Out << " [";
+      
+      for (unsigned op = 2, Eop = I.getNumOperands(); op < Eop; op += 2) {
+          Out << "\n    ";
+          writeOperand(I.getOperand(op  ), true);
+          Out << ", ";
+          writeOperand(I.getOperand(op+1), true);
+      }
+      Out << "\n  ]";
   } else if (isa<IndirectBrInst>(I)) {
     // Special case indirectbr instruction to get formatting nice and correct.
-    Out << ' ';
-    writeOperand(Operand, true);
-    Out << ", [";
-    
-    for (unsigned i = 1, e = I.getNumOperands(); i != e; ++i) {
-      if (i != 1)
-        Out << ", ";
-      writeOperand(I.getOperand(i), true);
-    }
-    Out << ']';
+      Out << ' ';
+      writeOperand(Operand, true);
+      Out << ", [";
+
+      for (unsigned i = 1, e = I.getNumOperands(); i != e; ++i) {
+          if (i != 1)
+              Out << ", ";
+          writeOperand(I.getOperand(i), true);
+      }
+      Out << ']';
   } else if (isa<PHINode>(I)) {
-    Out << ' ';
-    TypeGener.print(I.getType(), Out);
-    Out << ' ';
+      Out << ' ';
+      TypeGener.print(I.getType(), Out);
+      Out << ' ';
 
-    for (unsigned op = 0, Eop = I.getNumOperands(); op < Eop; op += 2) {
-      if (op) Out << ", ";
-      Out << "[ ";
-      writeOperand(I.getOperand(op  ), false); Out << ", ";
-      writeOperand(I.getOperand(op+1), false); Out << " ]";
-    }
+      for (unsigned op = 0, Eop = I.getNumOperands(); op < Eop; op += 2) {
+          if (op) Out << ", ";
+          Out << "[ ";
+          writeOperand(I.getOperand(op  ), false); Out << ", ";
+          writeOperand(I.getOperand(op+1), false); Out << " ]";
+      }
   } else if (const ExtractValueInst *EVI = dyn_cast<ExtractValueInst>(&I)) {
-    Out << ' ';
-    writeOperand(I.getOperand(0), true);
-    for (const unsigned *i = EVI->idx_begin(), *e = EVI->idx_end(); i != e; ++i)
-      Out << ", " << *i;
+      Out << ' ';
+      writeOperand(I.getOperand(0), true);
+      for (const unsigned *i = EVI->idx_begin(), *e = EVI->idx_end(); i != e; ++i)
+          Out << ", " << *i;
   } else if (const InsertValueInst *IVI = dyn_cast<InsertValueInst>(&I)) {
-    Out << ' ';
-    writeOperand(I.getOperand(0), true); Out << ", ";
-    writeOperand(I.getOperand(1), true);
-    for (const unsigned *i = IVI->idx_begin(), *e = IVI->idx_end(); i != e; ++i)
-      Out << ", " << *i;
+      Out << ' ';
+      writeOperand(I.getOperand(0), true); Out << ", ";
+      writeOperand(I.getOperand(1), true);
+      for (const unsigned *i = IVI->idx_begin(), *e = IVI->idx_end(); i != e; ++i)
+          Out << ", " << *i;
   } else if (isa<ReturnInst>(I) && !Operand) {
-    return;
+      return;
   } else if (const CallInst *CI = dyn_cast<CallInst>(&I)) {
-    // Print the calling convention being used.
-    switch (CI->getCallingConv()) {
-    case CallingConv::C: break;   // default
-    case CallingConv::Fast:  Out << " fastcc"; break;
-    case CallingConv::Cold:  Out << " coldcc"; break;
-    case CallingConv::X86_StdCall:  Out << " x86_stdcallcc"; break;
-    case CallingConv::X86_FastCall: Out << " x86_fastcallcc"; break;
-    case CallingConv::X86_ThisCall: Out << " x86_thiscallcc"; break;
-    case CallingConv::ARM_APCS:     Out << " arm_apcscc "; break;
-    case CallingConv::ARM_AAPCS:    Out << " arm_aapcscc "; break;
-    case CallingConv::ARM_AAPCS_VFP:Out << " arm_aapcs_vfpcc "; break;
-    case CallingConv::MSP430_INTR:  Out << " msp430_intrcc "; break;
-    case CallingConv::PTX_Kernel:   Out << " ptx_kernel"; break;
-    case CallingConv::PTX_Device:   Out << " ptx_device"; break;
-    default: Out << " cc" << CI->getCallingConv(); break;
-    }
-
-    Operand = CI->getCalledValue();
-    const PointerType    *PTy = cast<PointerType>(Operand->getType());
-    const FunctionType   *FTy = cast<FunctionType>(PTy->getElementType());
-    const Type         *RetTy = FTy->getReturnType();
-    const AttrListPtr &PAL = CI->getAttributes();
-
+      // Print the calling convention being used.
+      switch (CI->getCallingConv()) {
+      case CallingConv::C: break;   // default
+      case CallingConv::Fast:  Out << " fastcc"; break;
+      case CallingConv::Cold:  Out << " coldcc"; break;
+      case CallingConv::X86_StdCall:  Out << " x86_stdcallcc"; break;
+      case CallingConv::X86_FastCall: Out << " x86_fastcallcc"; break;
+      case CallingConv::X86_ThisCall: Out << " x86_thiscallcc"; break;
+      case CallingConv::ARM_APCS:     Out << " arm_apcscc "; break;
+      case CallingConv::ARM_AAPCS:    Out << " arm_aapcscc "; break;
+      case CallingConv::ARM_AAPCS_VFP:Out << " arm_aapcs_vfpcc "; break;
+      case CallingConv::MSP430_INTR:  Out << " msp430_intrcc "; break;
+      case CallingConv::PTX_Kernel:   Out << " ptx_kernel"; break;
+      case CallingConv::PTX_Device:   Out << " ptx_device"; break;
+      default: Out << " cc" << CI->getCallingConv(); break;
+      }
+      
+      Operand = CI->getCalledValue();
+      const PointerType    *PTy = cast<PointerType>(Operand->getType());
+      const FunctionType   *FTy = cast<FunctionType>(PTy->getElementType());
+      const Type         *RetTy = FTy->getReturnType();
+      const AttributeList &PAL = CI->getAttributes();
+      
 //    if (PAL.getRetAttributes() != Attribute::None)
 //      Out << ' ' << Attribute::getAsString(PAL.getRetAttributes());
 
@@ -495,116 +496,117 @@ void FunctionGen::printInstruction(const Instruction &I) {
     // only do this if the first argument is a pointer to a nonvararg function,
     // and if the return type is not a pointer to a function.
     //
-	name2=Operand->getName();
-
-	if (name2=="pthread_create"){
-		writeParamOperand(CI->getArgOperand(2),NULL);
-		Out<<'(';
-		writeParamOperand(CI->getArgOperand(3),NULL);
-		Out<<", "<<"_return"<<retCount<<");\n";
-		retCount++;
-		return ;
-	}
-
-	if (name2=="printf"){
-		Out<<' '<<name2;
-	}else{
-		Out << ' ';
-		if (!FTy->isVarArg() &&
-			(!RetTy->isPointerTy() ||
-			!cast<PointerType>(RetTy)->getElementType()->isFunctionTy())) {
-			//TypeGener.print(RetTy, Out);
-			// Out << ' ';
-			writeOperand(Operand, false);
-		} else {
-			writeOperand(Operand, false);
-		}
-	}
-    Out << '(';
-    for (unsigned op = 0, Eop = CI->getNumArgOperands(); op < Eop; ++op) {
-      if (op > 0)
-        Out << ", ";
-		writeParamOperand(CI->getArgOperand(op), PAL.getParamAttributes(op + 1));
-    }
-	if (name2!="printf"){
-		Out<<", ";
-		if (RetTy->isVoidTy())
-			Out<<"_syn";
-		else Out <<"_return"<<retCount;
-	}
-    Out << ')';
-	if (name2!="printf") {
-		if (RetTy->isVoidTy()){
-			Out << ";\n  _syn?0";
-		}else{
-			Out << ";\n  _return"<<retCount<<"?"<<name;
-			retCount++;
-		}
-	}
-//   if (PAL.getFnAttributes() != Attribute::None)
-//     Out << ' ' << Attribute::getAsString(PAL.getFnAttributes());
+      name2=Operand->getName();
+      
+      if (name2=="pthread_create"){
+          AttributeSet emptyAtt;
+          writeParamOperand(CI->getArgOperand(2), emptyAtt);
+          Out<<'(';
+          writeParamOperand(CI->getArgOperand(3),emptyAtt);
+          Out<<", "<<"_return"<<retCount<<");\n";
+          retCount++;
+          return ;
+      }
+      
+      if (name2=="printf"){
+          Out<<' '<<name2;
+      }else{
+          Out << ' ';
+          if (!FTy->isVarArg() &&
+              (!RetTy->isPointerTy() ||
+               !cast<PointerType>(RetTy)->getElementType()->isFunctionTy())) {
+              //TypeGener.print(RetTy, Out);
+              // Out << ' ';
+              writeOperand(Operand, false);
+          } else {
+              writeOperand(Operand, false);
+          }
+      }
+      Out << '(';
+      for (unsigned op = 0, Eop = CI->getNumArgOperands(); op < Eop; ++op) {
+          if (op > 0)
+              Out << ", ";
+          writeParamOperand(CI->getArgOperand(op), PAL.getParamAttributes(op + 1));
+      }
+      if (name2!="printf"){
+          Out<<", ";
+          if (RetTy->isVoidTy())
+              Out<<"_syn";
+          else Out <<"_return"<<retCount;
+      }
+      Out << ')';
+      if (name2!="printf") {
+          if (RetTy->isVoidTy()){
+              Out << ";\n  _syn?0";
+          }else{
+              Out << ";\n  _return"<<retCount<<"?"<<name;
+              retCount++;
+          }
+      }
+      //   if (PAL.getFnAttributes() != Attribute::None)
+      //     Out << ' ' << Attribute::getAsString(PAL.getFnAttributes());
   } else if (const InvokeInst *II = dyn_cast<InvokeInst>(&I)) {
-    Operand = II->getCalledValue();
-    const PointerType    *PTy = cast<PointerType>(Operand->getType());
-    const FunctionType   *FTy = cast<FunctionType>(PTy->getElementType());
-    const Type         *RetTy = FTy->getReturnType();
-    const AttrListPtr &PAL = II->getAttributes();
+      Operand = II->getCalledValue();
+      const PointerType    *PTy = cast<PointerType>(Operand->getType());
+      const FunctionType   *FTy = cast<FunctionType>(PTy->getElementType());
+      const Type         *RetTy = FTy->getReturnType();
+      const AttributeList &PAL = II->getAttributes();
 
-    // Print the calling convention being used.
-    switch (II->getCallingConv()) {
-    case CallingConv::C: break;   // default
-    case CallingConv::Fast:  Out << " fastcc"; break;
-    case CallingConv::Cold:  Out << " coldcc"; break;
-    case CallingConv::X86_StdCall:  Out << " x86_stdcallcc"; break;
-    case CallingConv::X86_FastCall: Out << " x86_fastcallcc"; break;
-    case CallingConv::X86_ThisCall: Out << " x86_thiscallcc"; break;
-    case CallingConv::ARM_APCS:     Out << " arm_apcscc "; break;
-    case CallingConv::ARM_AAPCS:    Out << " arm_aapcscc "; break;
-    case CallingConv::ARM_AAPCS_VFP:Out << " arm_aapcs_vfpcc "; break;
-    case CallingConv::MSP430_INTR:  Out << " msp430_intrcc "; break;
-    case CallingConv::PTX_Kernel:   Out << " ptx_kernel"; break;
-    case CallingConv::PTX_Device:   Out << " ptx_device"; break;
-    default: Out << " cc" << II->getCallingConv(); break;
-    }
+      // Print the calling convention being used.
+      switch (II->getCallingConv()) {
+      case CallingConv::C: break;   // default
+      case CallingConv::Fast:  Out << " fastcc"; break;
+      case CallingConv::Cold:  Out << " coldcc"; break;
+      case CallingConv::X86_StdCall:  Out << " x86_stdcallcc"; break;
+      case CallingConv::X86_FastCall: Out << " x86_fastcallcc"; break;
+      case CallingConv::X86_ThisCall: Out << " x86_thiscallcc"; break;
+      case CallingConv::ARM_APCS:     Out << " arm_apcscc "; break;
+      case CallingConv::ARM_AAPCS:    Out << " arm_aapcscc "; break;
+      case CallingConv::ARM_AAPCS_VFP:Out << " arm_aapcs_vfpcc "; break;
+      case CallingConv::MSP430_INTR:  Out << " msp430_intrcc "; break;
+      case CallingConv::PTX_Kernel:   Out << " ptx_kernel"; break;
+      case CallingConv::PTX_Device:   Out << " ptx_device"; break;
+      default: Out << " cc" << II->getCallingConv(); break;
+      }
 
-    if (PAL.getRetAttributes() != Attribute::None)
-      Out << ' ' << Attribute::getAsString(PAL.getRetAttributes());
+      if (PAL.getRetAttributes().hasAttributes())    
+          Out << ' ' << PAL.getRetAttributes().getAsString();
 
-    // If possible, print out the short form of the invoke instruction. We can
-    // only do this if the first argument is a pointer to a nonvararg function,
-    // and if the return type is not a pointer to a function.
-    //
-    Out << ' ';
-    if (!FTy->isVarArg() &&
-        (!RetTy->isPointerTy() ||
-         !cast<PointerType>(RetTy)->getElementType()->isFunctionTy())) {
-      TypeGener.print(RetTy, Out);
+      // If possible, print out the short form of the invoke instruction. We can
+      // only do this if the first argument is a pointer to a nonvararg function,
+      // and if the return type is not a pointer to a function.
+      //
       Out << ' ';
-      writeOperand(Operand, false);
-    } else {
-      writeOperand(Operand, true);
-    }
-    Out << '(';
-    for (unsigned op = 0, Eop = II->getNumArgOperands(); op < Eop; ++op) {
-      if (op)
-        Out << ", ";
-	  writeParamOperand(II->getArgOperand(op), PAL.getParamAttributes(op + 1));
-    }
+      if (!FTy->isVarArg() &&
+          (!RetTy->isPointerTy() ||
+           !cast<PointerType>(RetTy)->getElementType()->isFunctionTy())) {
+          TypeGener.print(RetTy, Out);
+          Out << ' ';
+          writeOperand(Operand, false);
+      } else {
+          writeOperand(Operand, true);
+      }
+      Out << '(';
+      for (unsigned op = 0, Eop = II->getNumArgOperands(); op < Eop; ++op) {
+          if (op)
+              Out << ", ";
+          writeParamOperand(II->getArgOperand(op), PAL.getParamAttributes(op + 1));
+      }
 
-    Out << ')';
-    if (PAL.getFnAttributes() != Attribute::None)
-      Out << ' ' << Attribute::getAsString(PAL.getFnAttributes());
+      Out << ')';
+      if (PAL.getFnAttributes().hasAttributes())
+          Out << ' ' << PAL.getFnAttributes().getAsString();
 
-    Out << "\n          to ";
-    writeOperand(II->getNormalDest(), true);
-    Out << " unwind ";
-    writeOperand(II->getUnwindDest(), true);
+      Out << "\n          to ";
+      writeOperand(II->getNormalDest(), true);
+      Out << " unwind ";
+      writeOperand(II->getUnwindDest(), true);
 
   } else if (isa<CastInst>(I)) {
-		if (Operand){
-			Out << ' ';
-			writeOperand(Operand,false);
-		}
+      if (Operand){
+          Out << ' ';
+          writeOperand(Operand,false);
+      }
 	/*  
     if (Operand) {
       Out << ' ';
@@ -613,14 +615,13 @@ void FunctionGen::printInstruction(const Instruction &I) {
     Out << " to ";
     TypeGener.print(I.getType(), Out);
 	*/
-/* caris
   } else if (isa<VAArgInst>(I)) {
-    if (Operand) {
-      Out << ' ';
-      writeOperand(Operand, true);   // Work with broken code
-    }
-    Out << ", ";
-    TypeGener.print(I.getType(), Out);
+      if (Operand) {
+          Out << ' ';
+          writeOperand(Operand, true);   // Work with broken code
+      }
+      Out << ", ";
+      TypeGener.print(I.getType(), Out);
   } else if (Operand) {   // Print the normal way.
 
     // PrintAllTypes - Instructions who have operands of all the same type
@@ -651,60 +652,61 @@ void FunctionGen::printInstruction(const Instruction &I) {
       TypeGener.print(TheType, Out);
     }
 */
-/* caris	
-	if (isa<SelectInst>(I)){
-		Out << '(';
-		writeOperand(I.getOperand(0),false);
-		Out << "!=0 -> ";
-		writeOperand(I.getOperand(1),false);
-		Out << " : ";
-		writeOperand(I.getOperand(2),false);
-		Out << ")";
-	}else if (isa<StoreInst>(I)){
-		writeOperand(I.getOperand(1),false);
-		Out << " = ";
-		writeOperand(I.getOperand(0),false);
-	}else  if (const CmpInst *CI = dyn_cast<CmpInst>(&I)){
-		Out << '(';
-		writeOperand(I.getOperand(0),false);
-		Out << ' ' << Helper::getPredicateText(CI->getPredicate())<<' ';
-		writeOperand(I.getOperand(1),false);
-		Out << ')';
-	}else if (const BinaryOperator *BI=dyn_cast<BinaryOperator>(&I)){
-		writeOperand(I.getOperand(0),false);
-		switch (BI->getOpcode()){
-			case Add:
-			case FAdd:Out<<" + ";break;
-			case Sub:
-			case FSub:Out << " - ";break;
-			case Mul:
-			case FMul:Out << " * "; break;
-			case UDiv:
-			case SDiv:
-			case FDiv:Out << " / ";break;
-			case URem:
-			case SRem:
-			case FRem:Out << " % ";break;
-			case Shl:Out << " << ";break;
-			case LShr:
-			case AShr:Out << " >> ";break;
-			case And:Out << " & ";break;
-			case Or:Out << " | ";break;
-			case Xor:Out<< " ^ ";break;
-		}
-		writeOperand(I.getOperand(1),false);
-	}else if (isa<ReturnInst>(I)){
-		Out <<"__return!";
-		writeOperand(I.getOperand(0),false);
-		Out << ";\n  goto LabelSkip";
-	}else{
-		for (unsigned i = 0, E = I.getNumOperands(); i != E; ++i) {
-			if (i) Out << ",[other] ";
-			writeOperand(I.getOperand(i), false);
-		}	
-	}
+	
+      if (isa<SelectInst>(I)){
+          Out << '(';
+          writeOperand(I.getOperand(0),false);
+          Out << "!=0 -> ";
+          writeOperand(I.getOperand(1),false);
+          Out << " : ";
+          writeOperand(I.getOperand(2),false);
+          Out << ")";
+      }else if (isa<StoreInst>(I)){
+          writeOperand(I.getOperand(1),false);
+          Out << " = ";
+          writeOperand(I.getOperand(0),false);
+      }else  if (const CmpInst *CI = dyn_cast<CmpInst>(&I)){
+          Out << '(';
+          writeOperand(I.getOperand(0),false);
+          Out << ' ' << Helper::getPredicateText(CI->getPredicate())<<' ';
+          writeOperand(I.getOperand(1),false);
+          Out << ')';
+      }else if (const BinaryOperator *BI=dyn_cast<BinaryOperator>(&I)){
+          writeOperand(I.getOperand(0),false);
+          switch (BI->getOpcode()){
+          case Instruction::BinaryOps::Add:
+          case Instruction::BinaryOps::FAdd:Out<<" + ";break;
+          case Instruction::BinaryOps::Sub:
+          case Instruction::BinaryOps::FSub:Out << " - ";break;
+          case Instruction::BinaryOps::Mul:
+          case Instruction::BinaryOps::FMul:Out << " * "; break;
+          case Instruction::BinaryOps::UDiv:
+          case Instruction::BinaryOps::SDiv:
+          case Instruction::BinaryOps::FDiv:Out << " / ";break;
+          case Instruction::BinaryOps::URem:
+          case Instruction::BinaryOps::SRem:
+          case Instruction::BinaryOps::FRem:Out << " % ";break;
+          case Instruction::BinaryOps::Shl: Out << " << ";break;
+          case Instruction::BinaryOps::LShr:
+          case Instruction::BinaryOps::AShr:Out << " >> ";break;
+          case Instruction::BinaryOps::And: Out << " & ";break;
+          case Instruction::BinaryOps::Or:  Out << " | ";break;
+          case Instruction::BinaryOps::Xor: Out<< " ^ ";break;
+          case Instruction::BinaryOps::BinaryOpsEnd:;
+          }
+          writeOperand(I.getOperand(1),false);
+      }else if (isa<ReturnInst>(I)){
+          Out <<"__return!";
+          writeOperand(I.getOperand(0),false);
+          Out << ";\n  goto LabelSkip";
+      }else{
+          for (unsigned i = 0, E = I.getNumOperands(); i != E; ++i) {
+              if (i) Out << ",[other] ";
+              writeOperand(I.getOperand(i), false);
+          }	
+      }
   }
-	Out << ";\n";
+  Out << ";\n";
   // Print post operand alignment for load/store.
 /*
   if (isa<LoadInst>(I) && cast<LoadInst>(I).getAlignment()) {
@@ -734,36 +736,33 @@ void FunctionGen::printInstruction(const Instruction &I) {
 */
   //printInfoComment(I);
 
-} // end of printInstructions()
+}
 
 void FunctionGen::writeOperand(const Value *Operand, bool PrintType) {
-  if (Operand == 0) {
-    Out << "<null operand!>";
-    return;
-  }
-  if (PrintType) {
-    TypeGener.print(Operand->getType(), Out);
-    Out << ' ';
-  }
-  Helper::WriteAsOperandInternal(Out, Operand, &TypeGener, &Machine, TheModule);
+    if (Operand == 0) {
+        Out << "<null operand!>";
+        return;
+    }
+    if (PrintType) {
+        TypeGener.print(Operand->getType(), Out);
+        Out << ' ';
+    }
+    Helper::WriteAsOperandInternal(Out, Operand, &TypeGener, &Machine, TheModule);
 }
 
-/* caris
 void FunctionGen::writeParamOperand(const Value *Operand,
-                                       Attributes Attrs) {
-  if (Operand == 0) {
-    Out << "<null operand!>";
-    return;
-  }
+                                    AttributeSet Attrs) {
+    if (Operand == 0) {
+        Out << "<null operand!>";
+        return;
+    }
 
-  // Print the type
-//  TypeGener.print(Operand->getType(), Out);
-  // Print parameter attributes list
-//  if (Attrs != Attribute::None)
-//    Out << ' ' << Attribute::getAsString(Attrs);
-//  Out << ' ';
-  // Print the operand
-  Helper::WriteAsOperandInternal(Out, Operand, &TypeGener, &Machine, TheModule);
+    // Print the type
+    //  TypeGener.print(Operand->getType(), Out);
+    // Print parameter attributes list
+    //  if (Attrs != Attribute::None)
+    //    Out << ' ' << Attribute::getAsString(Attrs);
+    //  Out << ' ';
+    // Print the operand
+    Helper::WriteAsOperandInternal(Out, Operand, &TypeGener, &Machine, TheModule);
 }
-caris */
-
