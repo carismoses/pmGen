@@ -83,9 +83,9 @@ void FunctionGen::printFunction(const Function *F) {
  // Out << ' ';
   Helper::WriteAsOperandInternal(Out, F, &TypeGener, &Machine, F->getParent());
   Out << '(';
-  /* caris
+  
   Machine.incorporateFunction(F);
-
+  
   // Loop over the arguments, printing them...
 
   unsigned Idx = 1;
@@ -98,6 +98,8 @@ void FunctionGen::printFunction(const Function *F) {
       printArgument(I, Attrs.getParamAttributes(Idx));
       Idx++;
     }
+  } // remove
+    /* caris
   } else {
     // Otherwise, print the types from the function type.
     for (unsigned i = 0, e = FT->getNumParams(); i != e; ++i) {
@@ -198,18 +200,18 @@ void FunctionGen::printFunction(const Function *F) {
   caris */
 }
 
-/* caris
+
 /// printArgument - This member is called for every argument that is passed into
 /// the function.  Simply print it out
 ///
 void FunctionGen::printArgument(const Argument *Arg,
-                                   Attributes Attrs) {
+                                   AttributeSet Attrs) {
   // Output type...
   TypeGener.print(Arg->getType(), Out);
 
   // Output parameter attributes list
-  if (Attrs != Attribute::None)
-    Out << ' ' << Attribute::getAsString(Attrs);
+  if (Attrs.hasAttributes())
+    Out << ' ' << Attrs.getAsString();
 
   // Output name, if available...
   if (Arg->hasName()) {
@@ -217,7 +219,7 @@ void FunctionGen::printArgument(const Argument *Arg,
 	Helper::PrintLLVMName(Out, Arg);
   }
 }
-
+/* caris
 /// printBasicBlock - This member is called for each basic block in a method.
 ///
 void FunctionGen::printBasicBlock(const BasicBlock *BB) {
