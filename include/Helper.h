@@ -61,12 +61,12 @@ namespace llvm {
         /// prefixed with % (if the string only contains simple characters) or is
         /// surrounded with ""'s (if it has special chars in it).  Print it out.
         static void PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix); 
-        static void PrintLLVMName(raw_ostream &OS, const Value &V);
+        static void PrintLLVMName(raw_ostream &OS, const Value *V);
 
         static void PrintEscapedString(StringRef Name,raw_ostream &Out);
 
         static void WriteAsOperandInternal(
-                                           raw_ostream &Out, const Value &V,
+                                           raw_ostream &Out, const Value *V,
                                            TypeGen *TypePrinter,
                                            SlotTracker *Machine,
                                            const Module *Context);

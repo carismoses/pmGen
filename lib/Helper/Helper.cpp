@@ -24,6 +24,11 @@
 //OLD#include "llvm/ADT/SmallString.h"
 //OLD#include "llvm/ADT/DenseSet.h"
 
+/* There are a lot of similarities between this file and AsmWriter.cpp in llvm
+Should go throughand note the differences... Does this just output PROMELA
+while AsmWrite outputs assembly code?? */
+
+
 using namespace llvm;
 
 // PrintEscapedString - Print each character of the specified string, escaping
@@ -87,8 +92,8 @@ void Helper::PrintLLVMName(raw_ostream &OS, StringRef Name, PrefixType Prefix) {
 }
 
 
-void Helper::PrintLLVMName(raw_ostream &OS, const Value &V) {
-	PrintLLVMName(OS, V.getName(),
+void Helper::PrintLLVMName(raw_ostream &OS, const Value *V) {
+	PrintLLVMName(OS, V->getName(),
                   isa<GlobalValue>(V) ? GlobalPrefix : LocalPrefix);
 }
 
@@ -316,11 +321,11 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
   
     if (const BlockAddress *BA = dyn_cast<BlockAddress>(CV)) {
         Out << "blockaddress(";
-        WriteAsOperandInternal(Out, *BA->getFunction(), &TypePrinter, Machine,
-                               Context);
+        WriteAsOperandInternal(Out, BA->getFunction(), &TypePrinter, Machine,
+                                Context);
         Out << ", ";
-        WriteAsOperandInternal(Out, *BA->getBasicBlock(), &TypePrinter, Machine,
-                               Context);
+        WriteAsOperandInternal(Out, BA->getBasicBlock(), &TypePrinter, Machine,
+                                Context);
         Out << ")";
         return;
     }
@@ -342,14 +347,14 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             if (CA->getNumOperands()) {
                 TypePrinter.print(ETy, Out);
                 Out << ' ';
-                WriteAsOperandInternal(Out, *CA->getOperand(0),
+                WriteAsOperandInternal(Out, CA->getOperand(0),
                                        &TypePrinter, Machine,
                                        Context);
                 for (unsigned i = 1, e = CA->getNumOperands(); i != e; ++i) {
                     Out << ", ";
                     TypePrinter.print(ETy, Out);
                     Out << ' ';
-                    WriteAsOperandInternal(Out, *CA->getOperand(i), &TypePrinter, Machine,
+                    WriteAsOperandInternal(Out, CA->getOperand(i), &TypePrinter, Machine,
                                            Context);
                 }
             }
@@ -368,7 +373,7 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             TypePrinter.print(CS->getOperand(0)->getType(), Out);
             Out << ' ';
 
-            WriteAsOperandInternal(Out, *CS->getOperand(0), &TypePrinter, Machine,
+            WriteAsOperandInternal(Out, CS->getOperand(0), &TypePrinter, Machine,
                                    Context);
             
             for (unsigned i = 1; i < N; i++) {
@@ -376,8 +381,8 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                 TypePrinter.print(CS->getOperand(i)->getType(), Out);
                 Out << ' ';
 
-                WriteAsOperandInternal(Out, *CS->getOperand(i), &TypePrinter, Machine,
-                                       Context);
+                WriteAsOperandInternal(Out, CS->getOperand(i), &TypePrinter, Machine,
+                                        Context);
             }
             Out << ' ';
         }
@@ -395,14 +400,14 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
         Out << '<';
         TypePrinter.print(ETy, Out);
         Out << ' ';
-        WriteAsOperandInternal(Out, *CP->getOperand(0), &TypePrinter, Machine,
-                               Context);
+        WriteAsOperandInternal(Out, CP->getOperand(0), &TypePrinter, Machine,
+                    Context);
         for (unsigned i = 1, e = CP->getNumOperands(); i != e; ++i) {
             Out << ", ";
             TypePrinter.print(ETy, Out);
             Out << ' ';
-            WriteAsOperandInternal(Out, *CP->getOperand(i), &TypePrinter, Machine,
-                                   Context);
+            WriteAsOperandInternal(Out, CP->getOperand(i), &TypePrinter, Machine,
+                                    Context);
         }
         Out << '>';
         return;
@@ -440,14 +445,14 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             if (cast<PointerType>((*OI)->getType())->getElementType()->getTypeID()==Type::StructTyID) isStruct=true;
 
             if (const Value* OIVal = dyn_cast<Value>(OI)){
-                WriteAsOperandInternal(Out,*OIVal,&TypePrinter,Machine,Context);
+                WriteAsOperandInternal(Out,OIVal,&TypePrinter,Machine,Context);
             
                 const Type *type=cast<PointerType>((*OI)->getType())->getElementType();
                 OI++;
                 if (isStruct){
                     if (dyn_cast<ConstantInt>(*OI)->getZExtValue()!=0){
                         Out <<'[';
-                        WriteAsOperandInternal(Out,*OIVal,&TypePrinter,Machine,Context);
+                        WriteAsOperandInternal(Out,OIVal,&TypePrinter,Machine,Context);
                         Out <<']';
                     }
                 }else{
@@ -468,7 +473,7 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                         type=ATY->getElementType();
                         if (type->getTypeID()==Type::StructTyID) isStruct=true;
                         Out<<'[';
-                        WriteAsOperandInternal(Out,*OIVal,&TypePrinter,Machine,Context);
+                        WriteAsOperandInternal(Out,OIVal,&TypePrinter,Machine,Context);
                         Out<<']';
                     }
                 }
@@ -485,7 +490,7 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
             TypePrinter.print((*OI)->getType(), Out);
             Out << ' ';
             const Value* OIVal = dyn_cast<Value>(OI);
-            WriteAsOperandInternal(Out, *OIVal, &TypePrinter, Machine, Context);
+            WriteAsOperandInternal(Out,OIVal, &TypePrinter, Machine, Context);
             if (OI+1 != CE->op_end())
                 Out << ", ";
         }
@@ -507,9 +512,7 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
 
     Out << "<placeholder or erroneous Constant>";
 }
-
 /*
-
   void Helper::WriteMDNodeBodyInternal(raw_ostream &Out, const MDNode *Node,
   TypeGen *TypePrinter,
   SlotTracker *Machine,
@@ -522,8 +525,8 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
     else {
       TypePrinter->print(V->getType(), Out);
       Out << ' ';
-      WriteAsOperandInternal(Out, Node->getOperand(mi), 
-                             TypePrinter, Machine, Context);
+      // WriteAsOperandInternal(Out, Node->getOperand(mi), 
+      //               TypePrinter, Machine, Context);
     }
     if (mi + 1 != me)
       Out << ", ";
@@ -532,27 +535,26 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
   Out << "}";
 }
 */
-
 /// WriteAsOperand - Write the name of the specified value out to the specified
 /// ostream.  This can be useful when you just want to print int %reg126, not
 /// the whole instruction that generated it.
-void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value &V,
+void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
                                     TypeGen *TypePrinter,
                                     SlotTracker *Machine,
                                     const Module *Context) {
-    if (V.hasName()) {
+    if (V->hasName()) {
         PrintLLVMName(Out, V);
         return;
     }
 
-    const Constant *CV = dyn_cast<Constant>(&V);
+    const Constant *CV = dyn_cast<Constant>(V);
     if (CV && !isa<GlobalValue>(CV)) {
         assert(TypePrinter && "Constants require TypeGen!");
         WriteConstantInternal(Out, CV, *TypePrinter, Machine, Context);
         return;
     }
 
-    if (const InlineAsm *IA = dyn_cast<InlineAsm>(&V)) {
+    if (const InlineAsm *IA = dyn_cast<InlineAsm>(V)) {
         Out << "asm ";
         if (IA->hasSideEffects())
             Out << "sideeffect ";
@@ -565,23 +567,24 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value &V,
         Out << '"';
         return;
     }
-    /*
-    if (const MDNode *N = dyn_cast<MDNode>(&V)) {
+    
+    if (const MDNode *N = dyn_cast<MDNode>(V)) {
         // MDNode no longer has as isFunctionLocal() method so only print
         // via slot reference number
         
-        // if (N->isFunctionLocal()) {
+        if (N->isFunctionLocal()) {
         // Print metadata inline, not via slot reference number.
-        //   WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
-        // return;
-        // }
+            WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
+            return;
+        }
   
-        // if (!Machine) {
-        // if (N->isFunctionLocal())
-        //Machine = new SlotTracker(N->getFunction());
-        // else
-        Machine = new SlotTracker(*Context);
-    // }
+        if (!Machine) {
+            if (N->isFunctionLocal())
+                Machine = new SlotTracker(N->getFunction());
+        else
+            Machine = new SlotTracker(*Context);
+        }
+        
         int Slot = Machine->getMetadataSlot(N);
         if (Slot == -1)
             Out << "<badref>";
@@ -589,14 +592,14 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value &V,
             Out << '!' << Slot;
         return;
     }
-    /*
+    
     if (const MDString MDS = dyn_cast<MDString>(*GV)) {
         Out << "!\"";
         PrintEscapedString(MDS.getString(), Out);
         Out << '"';
         return;
     }
-
+    /*
     // these types no longer exist
     // if (GV.getValueID() == Value::PseudoSourceValueVal ||
     // GV.getValueID() == Value::FixedStackPseudoSourceValueVal) {

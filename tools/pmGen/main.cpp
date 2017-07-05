@@ -75,8 +75,9 @@ int main (int argc, char ** argv)
             
             gvTmp<<' ';
             if(const Value *V = dyn_cast<Value>(GI))
-                Helper::WriteAsOperandInternal(gvTmp,*V,&TypeGener,&SlotTable,GI->getParent());
+                Helper::WriteAsOperandInternal(gvTmp,V,&TypeGener,&SlotTable,GI->getParent());
             gvTmp<<";\n";
+            gvTmp << "\n";
             gvTmp.flush();
 
             /*
