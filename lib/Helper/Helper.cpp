@@ -4,6 +4,8 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/InlineAsm.h"
+#include "llvm/IR/InlineAsm.h"
 #include <string>
 
 // #include "SlotTracker.h"
@@ -11,11 +13,9 @@
 // #include "TypeFinder.h"
 // #include "Define.h"
 // #include "llvm/IR/DerivedTypes.h"
-// #include "llvm/IR/InlineAsm.h"
 // #include "llvm/IR/Operator.h"
 // #include "llvm/Support/raw_ostream.h"
 // #include "llvm/ADT/StringRef.h"
-// #include "llvm/IR/Metadata.h"
 // #include "llvm/ADT/APFloat.h"
 // #include "llvm/IR/Constant.h"
 //OLD#include "llvm/Assembly/Writer.h"
@@ -552,24 +552,24 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value &V,
         return;
     }
 
-    /*
-    if (const InlineAsm IA = dyn_cast<InlineAsm>(*GV)) {
+    if (const InlineAsm *IA = dyn_cast<InlineAsm>(&V)) {
         Out << "asm ";
-        if (IA.hasSideEffects())
+        if (IA->hasSideEffects())
             Out << "sideeffect ";
-        if (IA.isAlignStack())
+        if (IA->isAlignStack())
             Out << "alignstack ";
         Out << '"';
-        PrintEscapedString(IA.getAsmString(), Out);
+        PrintEscapedString(IA->getAsmString(), Out);
         Out << "\", \"";
-        PrintEscapedString(IA.getConstraintString(), Out);
+        PrintEscapedString(IA->getConstraintString(), Out);
         Out << '"';
         return;
     }
-    // error: can't convert MDNode to bool
-    // if (const MDNode N = dyn_cast<MDNode>(*GV)) {
-    const MDNode N = dyn_cast<MDNode>(*GV)
-        // MDNode no longer has as isFunctionLocal() method 
+    /*
+    if (const MDNode *N = dyn_cast<MDNode>(&V)) {
+        // MDNode no longer has as isFunctionLocal() method so only print
+        // via slot reference number
+        
         // if (N->isFunctionLocal()) {
         // Print metadata inline, not via slot reference number.
         //   WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
@@ -582,14 +582,14 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value &V,
         // else
         Machine = new SlotTracker(*Context);
     // }
-    int Slot = Machine.getMetadataSlot(N);
-    if (Slot == -1)
-        Out << "<badref>";
-    else
-        Out << '!' << Slot;
-    return;
-    // }
-
+        int Slot = Machine->getMetadataSlot(N);
+        if (Slot == -1)
+            Out << "<badref>";
+        else
+            Out << '!' << Slot;
+        return;
+    }
+    /*
     if (const MDString MDS = dyn_cast<MDString>(*GV)) {
         Out << "!\"";
         PrintEscapedString(MDS.getString(), Out);
