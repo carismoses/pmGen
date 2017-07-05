@@ -115,39 +115,35 @@ void Helper::PrintLLVMName(raw_ostream &OS, const Value *V) {
   return 0;
   }
 
+*/
 
-
-  SlotTracker *Helper::createSlotTracker(const Value *V) {
+SlotTracker *Helper::createSlotTracker(const Value *V) {
   if (const Argument *FA = dyn_cast<Argument>(V))
-  return new SlotTracker(FA->getParent());
+    return new SlotTracker(FA->getParent());
 
   if (const Instruction *I = dyn_cast<Instruction>(V))
-  return new SlotTracker(I->getParent()->getParent());
+    if (I->getParent())
+      return new SlotTracker(I->getParent()->getParent());
 
   if (const BasicBlock *BB = dyn_cast<BasicBlock>(V))
-  return new SlotTracker(BB->getParent());
+    return new SlotTracker(BB->getParent());
 
   if (const GlobalVariable *GV = dyn_cast<GlobalVariable>(V))
-  return new SlotTracker(*GV->getParent());
+    return new SlotTracker(GV->getParent());
 
   if (const GlobalAlias *GA = dyn_cast<GlobalAlias>(V))
-  return new SlotTracker(*GA->getParent());
+    return new SlotTracker(GA->getParent());
+
+  if (const GlobalIFunc *GIF = dyn_cast<GlobalIFunc>(V))
+    return new SlotTracker(GIF->getParent());
 
   if (const Function *Func = dyn_cast<Function>(V))
-  return new SlotTracker(Func);
+    return new SlotTracker(Func);
 
-  // MetaData is no longer a subclass of Value
-  // (see line 452 of llvm/Metadata.h)
-  // if (const MDNode *MD = dyn_cast<MDNode>(V)) {
-  //   if (!MD->isFunctionLocal())
-  //     return new SlotTracker(MD->getFunction());
+  return nullptr;
+}
 
-  //  return new SlotTracker((Function *)0);
-  // }
-
-  return 0;
-  }
-
+/*
   const char *Helper::getPredicateText(unsigned predicate) {
   const char * pred = "unknown";
   switch (predicate) {
@@ -582,8 +578,7 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
             Slot = Machine->getLocalSlot(V);
         }
     } else {
-        // NEED TO UNCOMENT!
-        // Machine = createSlotTracker(V);
+        Machine = createSlotTracker(V);
         if (Machine) {
             if (const GlobalValue *GV = dyn_cast<GlobalValue>(V)) {
                 Slot = Machine->getGlobalSlot(GV);

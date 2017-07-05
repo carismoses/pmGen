@@ -35,7 +35,7 @@ SlotTracker::SlotTracker(const Module *M)
     : TheModule(M), TheFunction(0), FunctionProcessed(false), 
       mNext(0), fNext(0),  mdnNext(0) {
 }
-/*
+
 // Function level constructor. Causes the contents of the Module and the one
 // function provided to be added to the slot table.
 SlotTracker::SlotTracker(const Function *F)
@@ -46,13 +46,14 @@ SlotTracker::SlotTracker(const Function *F)
 inline void SlotTracker::initialize() {
     if (TheModule) {
         processModule();
-        TheModule = 0; ///< Prevent re-processing next time we're called.
+        TheModule = nullptr; ///< Prevent re-processing next time we're called.
     }
 
     if (TheFunction && !FunctionProcessed)
         processFunction();
 }
 
+/*
 // Iterate through all the global variables, functions, and global
 // variable initializers and create slots for them.
 void SlotTracker::processModule() {
