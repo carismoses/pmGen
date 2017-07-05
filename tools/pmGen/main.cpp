@@ -84,9 +84,8 @@ int main (int argc, char ** argv)
     for (Module::const_iterator FI=m->begin(),FE=m->end();FI!=FE;++FI){
         functionGener.printFunction(&*FI);
     }
-    /*
+
     Helper::InitBE(initProc,false);
     outs()<<initProc.str();
-    */	
-        return 0;
+    return 0;
 }
