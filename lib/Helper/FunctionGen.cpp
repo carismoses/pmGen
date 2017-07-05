@@ -1,4 +1,8 @@
 #include "FunctionGen.h"
+#include "llvm/IR/Function.h"
+#include "llvm/Support/FormattedStream.h"
+
+/* caris
 #include "Helper.h"
 #include "TypeGen.h"
 #include "SlotTracker.h"
@@ -19,12 +23,12 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/STLExtras.h"
-#include "llvm/Support/FormattedStream.h"
 #include "llvm/Support/CFG.h"
 #include <algorithm>
 #include <cctype>
 #include <map>
 #include <stdlib.h>
+caris */
 
 using namespace llvm;
 
@@ -67,6 +71,7 @@ void FunctionGen::printFunction(const Function *F) {
   default: Out << "cc" << F->getCallingConv() << " "; break;
   }
 */
+  /* caris
   const FunctionType *FT = F->getFunctionType();
   const AttrListPtr &Attrs = F->getAttributes();
   Attributes RetAttrs = Attrs.getRetAttributes();
@@ -134,6 +139,7 @@ void FunctionGen::printFunction(const Function *F) {
   if (F->hasGC())
     Out << " gc \"" << F->getGC() << '"';
 	*/
+  /* caris
   if (F->isDeclaration()) {
     Out << '\n';
   } else {
@@ -187,8 +193,10 @@ void FunctionGen::printFunction(const Function *F) {
   }
 
   Machine.purgeFunction();
+  caris */
 }
 
+/* caris
 /// printArgument - This member is called for every argument that is passed into
 /// the function.  Simply print it out
 ///
@@ -246,6 +254,7 @@ void FunctionGen::printBasicBlock(const BasicBlock *BB) {
     }
   }
 */
+/* caris
   Out << "\n";
 
   //if (AnnotationWriter) AnnotationWriter->emitBasicBlockStartAnnot(BB, Out);
@@ -296,6 +305,7 @@ void FunctionGen::printInfoComment(const Value &V) {
   }
 }
 */
+/* caris
 // This member is called for each Instruction in a function..
 void FunctionGen::printInstruction(const Instruction &I) {
   //if (AnnotationWriter) AnnotationWriter->emitInstructionAnnot(&I, Out);
@@ -374,6 +384,7 @@ flag1:
 */
   // Print out the opcode...
 //  Out << I.getOpcodeName();
+/* caris
   std::string opcodeName = I.getOpcodeName();
 
   // Print out optimization information.
@@ -602,6 +613,7 @@ flag1:
     Out << " to ";
     TypeGener.print(I.getType(), Out);
 	*/
+/* caris
   } else if (isa<VAArgInst>(I)) {
     if (Operand) {
       Out << ' ';
@@ -639,7 +651,7 @@ flag1:
       TypeGener.print(TheType, Out);
     }
 */
-	
+/* caris	
 	if (isa<SelectInst>(I)){
 		Out << '(';
 		writeOperand(I.getOperand(0),false);
@@ -721,6 +733,7 @@ flag1:
   }
 */
   //printInfoComment(I);
+/* caris
 }
 
 void FunctionGen::writeOperand(const Value *Operand, bool PrintType) {
@@ -751,5 +764,5 @@ void FunctionGen::writeParamOperand(const Value *Operand,
   // Print the operand
   Helper::WriteAsOperandInternal(Out, Operand, &TypeGener, &Machine, TheModule);
 }
-
+caris */
 

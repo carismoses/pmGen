@@ -140,14 +140,12 @@ emit_build_config: make_builddir
 	@echo $(LLVM_BIN_PATH) > $(BUILD_DIR)/_build_config
 
 # making pmGen executable
-$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o $(BUILD_DIR)/TypeGen.o $(BUILD_DIR)/TypeFinder.o $(BUILD_DIR)/SlotTracker.o $(BUILD_DIR)/Helper.o #$(BUILD_DIR)/FunctionGen.o
+$(BIN_DIR)/pmGen: $(BUILD_DIR)/main.o $(BUILD_DIR)/IO.o $(BUILD_DIR)/TypeGen.o $(BUILD_DIR)/TypeFinder.o $(BUILD_DIR)/SlotTracker.o $(BUILD_DIR)/Helper.o $(BUILD_DIR)/FunctionGen.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LLVM_LDFLAGS)  
 
-# compiling main.o
 $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
-# compiling IO.o
 $(BUILD_DIR)/IO.o: $(LIB_DIR)/IO/IO.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
@@ -163,8 +161,8 @@ $(BUILD_DIR)/Helper.o: $(LIB_DIR)/Helper/Helper.cpp
 $(BUILD_DIR)/SlotTracker.o: $(LIB_DIR)/Helper/SlotTracker.cpp
 	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
-#$(BUILD_DIR)/FunctionGen.o: $(LIB_DIR)/Helper/FunctionGen.cpp
-#	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
+$(BUILD_DIR)/FunctionGen.o: $(LIB_DIR)/Helper/FunctionGen.cpp
+	$(CXX) $(PMGEN_INCDIRS) $(CXXFLAGS) $(LLVM_CXXFLAGS) -c $(LLVM_LDFLAGS) -o $@ $^
 
 .PHONY: clean format
 

@@ -3,21 +3,14 @@
 #include "Helper.h"
 #include "TypeFinder.h"
 #include "SlotTracker.h"
+#include "FunctionGen.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/FormattedStream.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Type.h"
+#include "llvm/IR/ValueSymbolTable.h"
 #include <unistd.h>
-
-// #include "TypeFinder.h"
-// #include "Helper.h"
-// #include "SlotTracker.h"
-// #include "FunctionGen.h"
-// #include "llvm/Support/FormattedStream.h"
-// #include "llvm/AsmParser/Parser.h"
-// #include "llvm/IR/ModuleSlotTracker.h"
-//OLD#include "llvm/Assembly/Writer.h"
-//OLD#include "llvm/TypeSymbolTable.h"
 
 using namespace llvm;
 
@@ -55,6 +48,7 @@ int main (int argc, char ** argv)
 
     // populate TypeGener and numberedTypes with all types from Module
     typeFinder.Run(*m);
+    formatted_raw_ostream OS(outs());
 
     // print all type names
     TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
@@ -85,11 +79,12 @@ int main (int argc, char ** argv)
             outs()<<GVTmp;
         }
     }
-    /*
+    
     FunctionGen functionGener(TypeGener,SlotTable,OS,m);
     for (Module::const_iterator FI=m->begin(),FE=m->end();FI!=FE;++FI){
-        functionGener.printFunction(FI);
+        functionGener.printFunction(&*FI);
     }
+    /*
     Helper::InitBE(initProc,false);
     outs()<<initProc.str();
     */	
