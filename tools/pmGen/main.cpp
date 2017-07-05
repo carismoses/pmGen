@@ -75,7 +75,7 @@ int main (int argc, char ** argv)
             gvTmp.flush();
             Helper::Formatting(GVTmp);
             if (GI->hasInitializer())
-                Helper::InitGValue(initProc,*GI,&TypeGener,&SlotTable,GI->getParent());
+                Helper::InitGValue(initProc,&*GI,&TypeGener,&SlotTable,GI->getParent());
             outs()<<GVTmp;
         }
     }

@@ -671,12 +671,12 @@ void Helper::InitBE(raw_ostream &Out,bool BorE){
 	return ;
 }
 
-void Helper::InitGValue(raw_ostream &Out,const GlobalVariable &GV,TypeGen *TypePrinter,
+void Helper::InitGValue(raw_ostream &Out,const GlobalVariable *GV,TypeGen *TypePrinter,
 		SlotTracker *Machine,const Module *Context){
 
-	const Value *ini=GV.getInitializer();
+	const Value *ini=GV->getInitializer();
 	const Constant *CV=dyn_cast<Constant>(ini);
-	std::string name=GV.getName();
+	std::string name=GV->getName();
 	name="_"+name;
 
 	if (const ConstantInt *CI=dyn_cast<ConstantInt>(CV)){
