@@ -138,9 +138,9 @@ void SlotTracker::purgeFunction() {
 }
 */
 
-/* same as AsmWriter so commenting out for now
+
 /// getGlobalSlot - Get the slot number of a global value.
-int SlotTracker::getGlobalSlot(const GlobalValue *V) {
+inline int SlotTracker::getGlobalSlot(const GlobalValue *V) {
     // Check for uninitialized state and do lazy initialization.
     initialize();
 
@@ -148,11 +148,11 @@ int SlotTracker::getGlobalSlot(const GlobalValue *V) {
     ValueMap::iterator MI = mMap.find(V);
     return MI == mMap.end() ? -1 : (int)MI->second;
 }
-*/
 
-/* same as AsmWriter so commenting out for now
+
+
 /// getMetadataSlot - Get the slot number of a MDNode.
-int SlotTracker::getMetadataSlot(const MDNode *N) {
+inline int SlotTracker::getMetadataSlot(const MDNode *N) {
     // Check for uninitialized state and do lazy initialization.
     initialize();
 
@@ -160,11 +160,11 @@ int SlotTracker::getMetadataSlot(const MDNode *N) {
     mdn_iterator MI = mdnMap.find(N);
     return MI == mdnMap.end() ? -1 : (int)MI->second;
 }
-*/
 
-/* exactly the same as AsmWriter SlotTracker::getLocalSlot so commenting out for now
+
+
 /// getLocalSlot - Get the slot number for a value that is local to a function.
-int SlotTracker::getLocalSlot(const Value *V) {
+inline int SlotTracker::getLocalSlot(const Value *V) {
     assert(!isa<Constant>(V) && "Can't get a constant or global slot with this!");
 
     // Check for uninitialized state and do lazy initialization.
@@ -173,8 +173,8 @@ int SlotTracker::getLocalSlot(const Value *V) {
     ValueMap::iterator FI = fMap.find(V);
     return FI == fMap.end() ? -1 : (int)FI->second;
 }
-*/
-/*
+
+
 /// CreateModuleSlot - Insert the specified GlobalValue* into the slot table.
 void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
     assert(V && "Can't insert a null Value into SlotTracker!");

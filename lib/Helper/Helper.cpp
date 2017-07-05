@@ -1,4 +1,5 @@
 #include "Helper.h"
+#include "SlotTracker.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/raw_ostream.h"
