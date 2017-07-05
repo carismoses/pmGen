@@ -7,7 +7,7 @@
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/Support/FormattedStream.h"
 
-/* caris
+/* OLD HEADERS
 #include "TypeGen.h"
 #include "SlotTracker.h"
 #include "Define.h"
@@ -295,7 +295,6 @@ void FunctionGen::localValueDeclare(const Instruction &I){
 	}
 }
 
-/* caris
 /// printInfoComment - Print a little comment after the instruction indicating
 /// which slot it occupies.
 ///
