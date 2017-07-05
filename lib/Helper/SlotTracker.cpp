@@ -176,7 +176,7 @@ inline int SlotTracker::getLocalSlot(const Value *V) {
 
 
 /// CreateModuleSlot - Insert the specified GlobalValue* into the slot table.
-void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
+inline void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
     assert(V && "Can't insert a null Value into SlotTracker!");
     assert(!V->getType()->isVoidTy() && "Doesn't need a slot!");
     assert(!V->hasName() && "Doesn't need a slot!");
@@ -187,7 +187,7 @@ void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
 }
 
 /// CreateSlot - Create a new slot for the specified value if it has no name.
-void SlotTracker::CreateFunctionSlot(const Value *V) {
+inline void SlotTracker::CreateFunctionSlot(const Value *V) {
     assert(!V->getType()->isVoidTy() && !V->hasName() && "Doesn't need a slot!");
 
     unsigned DestSlot = fNext++;
@@ -197,7 +197,7 @@ void SlotTracker::CreateFunctionSlot(const Value *V) {
 }
 
 /// CreateModuleSlot - Insert the specified MDNode* into the slot table.
-void SlotTracker::CreateMetadataSlot(const MDNode *N) {
+inline void SlotTracker::CreateMetadataSlot(const MDNode *N) {
   assert(N && "Can't insert a null Value into SlotTracker!");
 
   unsigned DestSlot = mdnNext;
