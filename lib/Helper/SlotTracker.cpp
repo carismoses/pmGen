@@ -23,6 +23,10 @@
 //OLD#include "llvm/ADT/SmallString.h"
 //OLD#include "llvm/ADT/DenseSet.h"
 
+/* there is also a definition of a slot tracker in AsmWriter.cpp in llvm
+shoudl compare the two...
+*/
+
 using namespace llvm;
 
 // Module level constructor. Causes the contents of the Module (sans functions)
@@ -152,7 +156,7 @@ int SlotTracker::getMetadataSlot(const MDNode *N) {
     mdn_iterator MI = mdnMap.find(N);
     return MI == mdnMap.end() ? -1 : (int)MI->second;
 }
-
+*/
 
 /// getLocalSlot - Get the slot number for a value that is local to a function.
 int SlotTracker::getLocalSlot(const GlobalVariable *GV) {
@@ -165,7 +169,7 @@ int SlotTracker::getLocalSlot(const GlobalVariable *GV) {
     return FI == fMap.end() ? -1 : (int)FI->second;
 }
 
-
+/*
 /// CreateModuleSlot - Insert the specified GlobalValue* into the slot table.
 void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
     assert(V && "Can't insert a null Value into SlotTracker!");

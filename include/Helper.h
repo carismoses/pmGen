@@ -71,6 +71,15 @@ namespace llvm {
                                            SlotTracker *Machine,
                                            const Module *Context);
 
+        /// need seperate function for metadata since it is no longer
+        /// a subclass of Value
+        void WriteAsOperandInternal(
+                                    raw_ostream &Out, const Metadata *MD,
+                                    TypeGen *TypePrinter,
+                                    SlotTracker *Machine,
+                                    const Module *Context,
+                                    bool FromValue);
+            
         static const char *getPredicateText(unsigned predicate);
 	
         static void WriteOptimizationInfo(raw_ostream &Out, const User *U);	

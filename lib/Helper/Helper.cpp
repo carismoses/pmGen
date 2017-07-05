@@ -568,10 +568,11 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
         return;
     }
     
-    if (const MDNode *N = dyn_cast<MDNode>(V)) {
+    if (const MetadataAsValue *N = dyn_cast<MetadataAsValue>(V)) {
         // MDNode no longer has as isFunctionLocal() method so only print
-        // via slot reference number
-        
+        // via slot reference number. this has all been moved to
+        // WriteAsOperandInternal w/ FromValue parameter
+        /*
         if (N->isFunctionLocal()) {
         // Print metadata inline, not via slot reference number.
             WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
@@ -591,39 +592,44 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
         else
             Out << '!' << Slot;
         return;
+        */
+        WriteAsOperandInternal(Out, N->getMetadata(), TypePrinter, Machine, Context, /*FromValue */ true);
     }
-    
-    if (const MDString MDS = dyn_cast<MDString>(*GV)) {
+
+    /* more old metadata stuff
+    if (const MDString MDS = dyn_cast<MDString>(V)) {
         Out << "!\"";
         PrintEscapedString(MDS.getString(), Out);
         Out << '"';
         return;
     }
-    /*
-    // these types no longer exist
-    // if (GV.getValueID() == Value::PseudoSourceValueVal ||
-    // GV.getValueID() == Value::FixedStackPseudoSourceValueVal) {
-    // GV.print(Out);
-    // return;
-    // }
+    */
+    
+    /* these types no longer exist
+    if (GV.getValueID() == Value::PseudoSourceValueVal ||
+        GV.getValueID() == Value::FixedStackPseudoSourceValueVal) {
+        GV.print(Out);
+        return;
+    }
+    */
 
     char Prefix = 'v';
     int Slot;
     if (Machine) {
-        if (const GlobalValue GGV = dyn_cast<GlobalValue>(*GV)) {
-            Slot = Machine->getGlobalSlot(GGV);
+        if (const GlobalValue *GV = dyn_cast<GlobalValue>(V)) {
+            Slot = Machine->getGlobalSlot(GV);
             Prefix = '_';
         } else {
-            Slot = Machine->getLocalSlot(&GV);
+            Slot = Machine->getLocalSlot(V);
         }
     } else {
-        Machine = createSlotTracker(&GV);
+        Machine = createSlotTracker(V);
         if (Machine) {
-            if (const GlobalValue GGV = dyn_cast<GlobalValue>(*GV)) {
-                Slot = Machine->getGlobalSlot(GGV);
+            if (const GlobalValue *GV = dyn_cast<GlobalValue>(V)) {
+                Slot = Machine->getGlobalSlot(GV);
                 Prefix = '@';
             } else {
-                Slot = Machine->getLocalSlot(&GV);
+                Slot = Machine->getLocalSlot(V);
             }
             delete Machine;
         } else {
@@ -635,8 +641,46 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
         Out << Prefix << Slot;
     else
         Out << "<badref>";
-    */
 }
+
+void Helper::WriteAsOperandInternal(raw_ostream &Out, const Metadata *MD,
+                                    TypeGen *TypePrinter,
+                                    SlotTracker *Machine,
+                                    const Module *Context,
+                                    bool FromValue) {
+    if (const MDNode *N = dyn_cast<MDNode>(MD)) {
+        std::unique_ptr<SlotTracker> MachineStorage;
+        if (!Machine) {
+            MachineStorage = make_unique<SlotTracker>(Context);
+            Machine = MachineStorage.get();
+        }
+        int Slot = Machine->getMetadataSlot(N);
+        if (Slot == -1)
+            // Give the pointer value instead of "badref", since this comes up all
+            // the time when debugging.
+            Out << "<" << N << ">";
+        else
+            Out << '!' << Slot;
+        return;
+    }
+
+    if (const MDString *MDS = dyn_cast<MDString>(MD)) {
+        Out << "!\"";
+        PrintEscapedString(MDS->getString(), Out);
+        Out << '"';
+        return;
+    }
+
+    auto *V = cast<ValueAsMetadata>(MD);
+    assert(TypePrinter && "TypePrinter required for metadata values");
+    assert((FromValue || !isa<LocalAsMetadata>(V)) &&
+           "Unexpected function-local metadata outside of value argument");
+
+    TypePrinter->print(V->getValue()->getType(), Out);
+    Out << ' ';
+    WriteAsOperandInternal(Out, V->getValue(), TypePrinter, Machine, Context);
+}
+
 
 /*
 void Helper::WriteAsOperand(raw_ostream &Out, const Value *V,
