@@ -98,8 +98,6 @@ void FunctionGen::printFunction(const Function *F) {
       printArgument(I, Attrs.getParamAttributes(Idx));
       Idx++;
     }
-  } // remove
-    /* caris
   } else {
     // Otherwise, print the types from the function type.
     for (unsigned i = 0, e = FT->getNumParams(); i != e; ++i) {
@@ -109,18 +107,19 @@ void FunctionGen::printFunction(const Function *F) {
       // Output type...
       TypeGener.print(FT->getParamType(i), Out);
 
-      Attributes ArgAttrs = Attrs.getParamAttributes(i+1);
-      if (ArgAttrs != Attribute::None)
-        Out << ' ' << Attribute::getAsString(ArgAttrs);
+      AttributeSet ArgAttrs = Attrs.getParamAttributes(i+1);
+      if (ArgAttrs.hasAttributes())
+        Out << ' ' << ArgAttrs.getAsString();
     }
   }
+  
   if (FT->getNumParams()>0) Out <<"; ";
   if (returnType->isVoidTy()){
 	Out <<"chan __syn";
   }else{
 	  Out <<"chan __return";
   }
-
+  
   // Finish printing arguments...
   if (FT->isVarArg()) {
     if (FT->getNumParams()) Out << ", ";
@@ -143,7 +142,7 @@ void FunctionGen::printFunction(const Function *F) {
   if (F->hasGC())
     Out << " gc \"" << F->getGC() << '"';
 	*/
-  /* caris
+  
   if (F->isDeclaration()) {
     Out << '\n';
   } else {
@@ -162,7 +161,9 @@ void FunctionGen::printFunction(const Function *F) {
 	Out<<"int currentLabel;\n";
 	
 	Out<<"chan _syn = [0] of { int };\n";
-//TODO map 优化
+  } //remove
+    /*
+    //TODO map 优化
 //
 //
 	retCount=0;
