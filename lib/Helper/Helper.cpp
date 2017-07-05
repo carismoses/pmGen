@@ -143,41 +143,40 @@ SlotTracker *Helper::createSlotTracker(const Value *V) {
   return nullptr;
 }
 
+const char *Helper::getPredicateText(unsigned predicate) {
+    const char * pred = "unknown";
+    switch (predicate) {
+    case FCmpInst::FCMP_FALSE: pred = "false"; break;
+    case FCmpInst::FCMP_OEQ:   pred = "=="; break;
+    case FCmpInst::FCMP_OGT:   pred = ">"; break;
+    case FCmpInst::FCMP_OGE:   pred = ">="; break;
+    case FCmpInst::FCMP_OLT:   pred = "<"; break;
+    case FCmpInst::FCMP_OLE:   pred = "<="; break;
+    case FCmpInst::FCMP_ONE:   pred = "!="; break;
+    case FCmpInst::FCMP_ORD:   pred = "ord"; break;
+    case FCmpInst::FCMP_UNO:   pred = "uno"; break;
+    case FCmpInst::FCMP_UEQ:   pred = "=="; break;
+    case FCmpInst::FCMP_UGT:   pred = ">"; break;
+    case FCmpInst::FCMP_UGE:   pred = ">="; break;
+    case FCmpInst::FCMP_ULT:   pred = "<"; break;
+    case FCmpInst::FCMP_ULE:   pred = "<="; break;
+    case FCmpInst::FCMP_UNE:   pred = "!="; break;
+    case FCmpInst::FCMP_TRUE:  pred = "true"; break;
+    case ICmpInst::ICMP_EQ:    pred = "=="; break;
+    case ICmpInst::ICMP_NE:    pred = "!="; break;
+    case ICmpInst::ICMP_SGT:   pred = ">"; break;
+    case ICmpInst::ICMP_SGE:   pred = ">="; break;
+    case ICmpInst::ICMP_SLT:   pred = "<"; break;
+    case ICmpInst::ICMP_SLE:   pred = "<="; break;
+    case ICmpInst::ICMP_UGT:   pred = ">"; break;
+    case ICmpInst::ICMP_UGE:   pred = ">="; break;
+    case ICmpInst::ICMP_ULT:   pred = "<"; break;
+    case ICmpInst::ICMP_ULE:   pred = "<="; break;
+    }
+    return pred;
+}
+
 /*
-  const char *Helper::getPredicateText(unsigned predicate) {
-  const char * pred = "unknown";
-  switch (predicate) {
-  case FCmpInst::FCMP_FALSE: pred = "false"; break;
-  case FCmpInst::FCMP_OEQ:   pred = "=="; break;
-  case FCmpInst::FCMP_OGT:   pred = ">"; break;
-  case FCmpInst::FCMP_OGE:   pred = ">="; break;
-  case FCmpInst::FCMP_OLT:   pred = "<"; break;
-  case FCmpInst::FCMP_OLE:   pred = "<="; break;
-  case FCmpInst::FCMP_ONE:   pred = "!="; break;
-  case FCmpInst::FCMP_ORD:   pred = "ord"; break;
-  case FCmpInst::FCMP_UNO:   pred = "uno"; break;
-  case FCmpInst::FCMP_UEQ:   pred = "=="; break;
-  case FCmpInst::FCMP_UGT:   pred = ">"; break;
-  case FCmpInst::FCMP_UGE:   pred = ">="; break;
-  case FCmpInst::FCMP_ULT:   pred = "<"; break;
-  case FCmpInst::FCMP_ULE:   pred = "<="; break;
-  case FCmpInst::FCMP_UNE:   pred = "!="; break;
-  case FCmpInst::FCMP_TRUE:  pred = "true"; break;
-  case ICmpInst::ICMP_EQ:    pred = "=="; break;
-  case ICmpInst::ICMP_NE:    pred = "!="; break;
-  case ICmpInst::ICMP_SGT:   pred = ">"; break;
-  case ICmpInst::ICMP_SGE:   pred = ">="; break;
-  case ICmpInst::ICMP_SLT:   pred = "<"; break;
-  case ICmpInst::ICMP_SLE:   pred = "<="; break;
-  case ICmpInst::ICMP_UGT:   pred = ">"; break;
-  case ICmpInst::ICMP_UGE:   pred = ">="; break;
-  case ICmpInst::ICMP_ULT:   pred = "<"; break;
-  case ICmpInst::ICMP_ULE:   pred = "<="; break;
-  }
-  return pred;
-  }
-
-
   void Helper::WriteOptimizationInfo(raw_ostream &Out, const User *U) {
   if (const OverflowingBinaryOperator *OBO =
   dyn_cast<OverflowingBinaryOperator>(U)) {
@@ -706,14 +705,14 @@ void Helper::Formatting(std::string &s){
 	std::string tmp=s;
 	bool flag=true;
 	if (s.size()==0) return ;
-	for (i=0;i<s.size();i++){
+	for (uint i=0;i<s.size();i++){
 		if (s[i]=='[') { st=i;flag=false; }
 		if (s[i]==']') { ed=i; }
 	}
 	if (flag) return ;
 	int j=0;
 	for (i=0;i<st;i++)	s[j++]=tmp[i];
-	for (i=ed+1;i<s.size()-2;i++) s[j++]=tmp[i];
+	for (uint i=ed+1;i<s.size()-2;i++) s[j++]=tmp[i];
 	for (i=st;i<=ed;i++) s[j++]=tmp[i];
 	return ;
 }
