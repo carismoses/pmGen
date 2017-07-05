@@ -1,9 +1,10 @@
 #include "FunctionGen.h"
+#include "Helper.h"
 #include "llvm/IR/Function.h"
+#include "llvm/IR/Attributes.h"
 #include "llvm/Support/FormattedStream.h"
 
 /* caris
-#include "Helper.h"
 #include "TypeGen.h"
 #include "SlotTracker.h"
 #include "Define.h"
@@ -71,10 +72,10 @@ void FunctionGen::printFunction(const Function *F) {
   default: Out << "cc" << F->getCallingConv() << " "; break;
   }
 */
-  /* caris
+  
   const FunctionType *FT = F->getFunctionType();
-  const AttrListPtr &Attrs = F->getAttributes();
-  Attributes RetAttrs = Attrs.getRetAttributes();
+  const AttributeList &Attrs = F->getAttributes();
+  AttributeSet RetAttrs = Attrs.getRetAttributes();
  // if (RetAttrs != Attribute::None)
  //   Out <<  Attribute::getAsString(Attrs.getRetAttributes()) << ' ';
   const Type *returnType=F->getReturnType();
@@ -82,6 +83,7 @@ void FunctionGen::printFunction(const Function *F) {
  // Out << ' ';
   Helper::WriteAsOperandInternal(Out, F, &TypeGener, &Machine, F->getParent());
   Out << '(';
+  /* caris
   Machine.incorporateFunction(F);
 
   // Loop over the arguments, printing them...
