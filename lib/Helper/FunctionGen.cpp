@@ -185,7 +185,7 @@ void FunctionGen::printFunction(const Function *F) {
 	retCount=0;
     for (Function::const_iterator I = F->begin(), E = F->end(); I != E; ++I){
 		flag=false;
-		printBasicBlock(I);
+		printBasicBlock(&*I);
 	}
 	if (returnType->isVoidTy())
 		Out <<"__syn!0;\n";
@@ -305,7 +305,7 @@ void FunctionGen::printInfoComment(const Value &V) {
   }
 }
 */
-/* caris
+
 // This member is called for each Instruction in a function..
 void FunctionGen::printInstruction(const Instruction &I) {
   //if (AnnotationWriter) AnnotationWriter->emitInstructionAnnot(&I, Out);
@@ -353,11 +353,11 @@ void FunctionGen::printInstruction(const Instruction &I) {
 	if (const CallInst *CI = dyn_cast<CallInst>(&I)) {
 		if (CI->getCalledValue()->getName()!="printf")
 			Out <<"run ";
-		goto flag1;
+        // uncomment !!!	goto flag1;
 	}
 	if (I.hasName() || !I.getType()->isVoidTy())
-	Out <<name<<" = ";
-flag1:
+        Out <<name<<" = ";
+    // uncomment!!!  flag1:
   // Print out name if it exists...
 /*
   if (I.hasName()) {
@@ -733,8 +733,8 @@ flag1:
   }
 */
   //printInfoComment(I);
-/* caris
-}
+
+} // end of printInstructions()
 
 void FunctionGen::writeOperand(const Value *Operand, bool PrintType) {
   if (Operand == 0) {
@@ -748,6 +748,7 @@ void FunctionGen::writeOperand(const Value *Operand, bool PrintType) {
   Helper::WriteAsOperandInternal(Out, Operand, &TypeGener, &Machine, TheModule);
 }
 
+/* caris
 void FunctionGen::writeParamOperand(const Value *Operand,
                                        Attributes Attrs) {
   if (Operand == 0) {
