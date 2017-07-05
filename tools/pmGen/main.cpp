@@ -68,8 +68,8 @@ int main (int argc, char ** argv)
             TypeGener.print(GI->getType()->getElementType(),gvTmp);
             
             gvTmp<<' ';
-            if(const Value *V = dyn_cast<Value>(GI))
-                Helper::WriteAsOperandInternal(gvTmp,V,&TypeGener,&SlotTable,GI->getParent());
+            // if(const Value *V = dyn_cast<Value>(GI))
+            Helper::WriteAsOperandInternal(gvTmp,&*GI,&TypeGener,&SlotTable,GI->getParent());
             gvTmp<<";\n";
             gvTmp << "\n";
             gvTmp.flush();
