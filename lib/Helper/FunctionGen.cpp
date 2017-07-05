@@ -2,6 +2,7 @@
 #include "Helper.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Attributes.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/Support/FormattedStream.h"
 
 /* caris
@@ -161,8 +162,6 @@ void FunctionGen::printFunction(const Function *F) {
 	Out<<"int currentLabel;\n";
 	
 	Out<<"chan _syn = [0] of { int };\n";
-  } //remove
-    /*
     //TODO map 优化
 //
 //
@@ -184,7 +183,6 @@ void FunctionGen::printFunction(const Function *F) {
 		}
 	}
 	retCount=0;
-
     for (Function::const_iterator I = F->begin(), E = F->end(); I != E; ++I){
 		flag=false;
 		printBasicBlock(I);
@@ -193,14 +191,10 @@ void FunctionGen::printFunction(const Function *F) {
 		Out <<"__syn!0;\n";
 
 	Out<<"LabelSkip:skip\n";
-
     Out << "}\n";
   }
-
   Machine.purgeFunction();
-  caris */
 }
-
 
 /// printArgument - This member is called for every argument that is passed into
 /// the function.  Simply print it out
@@ -220,58 +214,58 @@ void FunctionGen::printArgument(const Argument *Arg,
 	Helper::PrintLLVMName(Out, Arg);
   }
 }
-/* caris
+
 /// printBasicBlock - This member is called for each basic block in a method.
 ///
 void FunctionGen::printBasicBlock(const BasicBlock *BB) {
-  if (BB->hasName()) {              // Print out the label if it exists...
-    Out << "\n";
-	Out << "Label"<<gos.find(BB->getName())->second<<':';
-	//Helper::PrintLLVMName(Out, BB->getName(), LabelPrefix);
-    //Out << ':';
-  } else if (!BB->use_empty()) {      // Don't print block # of no uses...
-    Out << "\n; <label>:";
-    int Slot = Machine.getLocalSlot(BB);
-    if (Slot != -1)
-      Out << Slot;
-    else
-      Out << "<badref>";
-  }
-/*
-  if (BB->getParent() == 0) {
-    Out.PadToColumn(50);
-    Out << "; Error: Block without parent!";
-  } else if (BB != &BB->getParent()->getEntryBlock()) {  // Not the entry block?
-    // Output predecessors for the block.
-    Out.PadToColumn(50);
-    Out << ";";
-    const_pred_iterator PI = pred_begin(BB), PE = pred_end(BB);
+    if (BB->hasName()) {              // Print out the label if it exists...
+        Out << "\n";
+        Out << "Label"<<gos.find(BB->getName())->second<<':';
+        //Helper::PrintLLVMName(Out, BB->getName(), LabelPrefix);
+        //Out << ':';
+    } else if (!BB->use_empty()) {      // Don't print block # of no uses...
+        Out << "\n; <label>:";
+        int Slot = Machine.getLocalSlot(BB);
+        if (Slot != -1)
+            Out << Slot;
+        else
+            Out << "<badref>";
+    }
+    /*
+      if (BB->getParent() == 0) {
+      Out.PadToColumn(50);
+      Out << "; Error: Block without parent!";
+      } else if (BB != &BB->getParent()->getEntryBlock()) {  // Not the entry block?
+      // Output predecessors for the block.
+      Out.PadToColumn(50);
+      Out << ";";
+      const_pred_iterator PI = pred_begin(BB), PE = pred_end(BB);
 
-    if (PI == PE) {
+      if (PI == PE) {
       Out << " No predecessors!";
-    } else {
+      } else {
       Out << " preds = ";
       writeOperand(*PI, false);
       for (++PI; PI != PE; ++PI) {
-        Out << ", ";
-        writeOperand(*PI, false);
+      Out << ", ";
+      writeOperand(*PI, false);
       }
+      }
+      }
+    */
+
+    Out << "\n";
+
+    //if (AnnotationWriter) AnnotationWriter->emitBasicBlockStartAnnot(BB, Out);
+
+
+    // Output all of the instructions in the basic block...
+    for (BasicBlock::const_iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
+        printInstruction(*I);
+        // Out << '\n';
     }
-  }
-*/
-/* caris
-  Out << "\n";
 
-  //if (AnnotationWriter) AnnotationWriter->emitBasicBlockStartAnnot(BB, Out);
-
-
-  // Output all of the instructions in the basic block...
-  for (BasicBlock::const_iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
-    printInstruction(*I);
-   // Out << '\n';
-  }
-
-  //if (AnnotationWriter) AnnotationWriter->emitBasicBlockEndAnnot(BB, Out);
+    //if (AnnotationWriter) AnnotationWriter->emitBasicBlockEndAnnot(BB, Out);
 }
 
 void FunctionGen::localValueDeclare(const Instruction &I){
@@ -299,6 +293,7 @@ void FunctionGen::localValueDeclare(const Instruction &I){
 	}
 }
 
+/* caris
 /// printInfoComment - Print a little comment after the instruction indicating
 /// which slot it occupies.
 ///
