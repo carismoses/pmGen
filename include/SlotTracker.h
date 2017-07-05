@@ -26,7 +26,7 @@ namespace llvm {
 
     private:
         /// TheModule - The module for which we are holding slot numbers.
-        const Module& TheModule;
+        const Module* TheModule;
 
         /// TheFunction - The function for which we are holding slot numbers.
         const Function* TheFunction;
@@ -45,15 +45,15 @@ namespace llvm {
         unsigned mdnNext;
     public:
         /// Construct from a module
-        explicit SlotTracker(const Module& M);
+        explicit SlotTracker(const Module *M);
         /// Construct from a function, starting out in incorp state.
         explicit SlotTracker(const Function *F);
 
         /// Return the slot number of the specified value in it's type
         /// plane.  If something is not in the SlotTracker, return -1.
-        int getLocalSlot(const GlobalVariable *GV);
-        int getGlobalSlot(const GlobalValue *V);
-        int getMetadataSlot(const MDNode *N);
+        // int getLocalSlot(const Value *V);
+        // int getGlobalSlot(const GlobalValue *V);
+        // int getMetadataSlot(const MDNode *N);
 
         /// If you'd like to deal with a function instead of just a module, use
         /// this method to get its data into the SlotTracker.

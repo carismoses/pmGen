@@ -5,7 +5,6 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/InlineAsm.h"
-#include "llvm/IR/InlineAsm.h"
 #include <string>
 
 // #include "SlotTracker.h"
@@ -623,7 +622,8 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
             Slot = Machine->getLocalSlot(V);
         }
     } else {
-        Machine = createSlotTracker(V);
+        // NEED TO UNCOMENT!
+        // Machine = createSlotTracker(V);
         if (Machine) {
             if (const GlobalValue *GV = dyn_cast<GlobalValue>(V)) {
                 Slot = Machine->getGlobalSlot(GV);

@@ -45,10 +45,10 @@ int main (int argc, char ** argv)
     }
 
     // get Module from input file
-    std::unique_ptr<Module> m = parseModule(InputFileName,Context);
+    Module* m = parseModule(InputFileName,Context);
     
 	TypeGen TypeGener;
-    SlotTracker SlotTable(*m);
+    SlotTracker SlotTable(m);
     ConStr conStr;
     std::vector<const Type*> numberedTypes;
     TypeFinder typeFinder(TypeGener,numberedTypes);

@@ -73,7 +73,7 @@ namespace llvm {
 
         /// need seperate function for metadata since it is no longer
         /// a subclass of Value
-        void WriteAsOperandInternal(
+        static void WriteAsOperandInternal(
                                     raw_ostream &Out, const Metadata *MD,
                                     TypeGen *TypePrinter,
                                     SlotTracker *Machine,

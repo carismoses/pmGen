@@ -6,9 +6,11 @@
 
 using namespace std;
 
-std::unique_ptr<Module> parseModule(std::string InputFileName,LLVMContext &Context){
+Module* parseModule(std::string InputFileName,LLVMContext &Context){
 	SMDiagnostic Err;
-	std::unique_ptr<Module> m=parseIRFile(InputFileName,Err,Context);
+
+    // returned as a unique_ptr so have to release
+	Module* m=parseIRFile(InputFileName,Err,Context).release();
 	return m;
 }
 

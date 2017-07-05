@@ -7,6 +7,6 @@
 using namespace llvm;
 
 /// uses parseIRFile from llvm to parse the input .bc file into a Module
-std::unique_ptr< Module > parseModule(std::string InputFileName,LLVMContext &Context);
+Module* parseModule(std::string InputFileName,LLVMContext &Context);
 
 #endif
