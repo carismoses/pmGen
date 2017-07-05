@@ -721,12 +721,12 @@ void Helper::Formatting(std::string &s){
 // this is the only place that sets the pConStr pointer
 ConStr *ConStr::pConStr=new ConStr();
 
-bool ConStr::isConStr(const GlobalVariable &V){
-    if (V.hasInitializer()){
+bool ConStr::isConStr(const GlobalVariable *V){
+    if (V->hasInitializer()){
         // now only type ConstantDataSequential can use isString()
-        const ConstantDataSequential *CDS=dyn_cast<ConstantDataSequential>(V.getInitializer());
+        const ConstantDataSequential *CDS=dyn_cast<ConstantDataSequential>(V->getInitializer());
         if (CDS && CDS->isString()){
-            get()->conStr.insert(std::pair<StringRef,std::string>(V.getName(),CDS->getAsString()));
+            get()->conStr.insert(std::pair<StringRef,std::string>(V->getName(),CDS->getAsString()));
             return true;
         }
     }

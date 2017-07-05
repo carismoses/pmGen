@@ -62,7 +62,7 @@ int main (int argc, char ** argv)
          GI!=GE;++GI) {
         // if it has an initializer and is of type ConstantDataSequential.isString(), add it to conStr
         // else, enter this loop
-        if (!conStr.isConStr(*GI)){
+        if (!conStr.isConStr(&*GI)){
             GVTmp.clear();
             // not sure what this is doing. getType() doesn't appear to be  function of GlobalVariable...
             TypeGener.print(GI->getType()->getElementType(),gvTmp);
