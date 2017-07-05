@@ -569,49 +569,8 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
     }
     
     if (const MetadataAsValue *N = dyn_cast<MetadataAsValue>(V)) {
-        // MDNode no longer has as isFunctionLocal() method so only print
-        // via slot reference number. this has all been moved to
-        // WriteAsOperandInternal w/ FromValue parameter
-        /*
-        if (N->isFunctionLocal()) {
-        // Print metadata inline, not via slot reference number.
-            WriteMDNodeBodyInternal(Out, N, TypePrinter, Machine, Context);
-            return;
-        }
-  
-        if (!Machine) {
-            if (N->isFunctionLocal())
-                Machine = new SlotTracker(N->getFunction());
-        else
-            Machine = new SlotTracker(*Context);
-        }
-        
-        int Slot = Machine->getMetadataSlot(N);
-        if (Slot == -1)
-            Out << "<badref>";
-        else
-            Out << '!' << Slot;
-        return;
-        */
         WriteAsOperandInternal(Out, N->getMetadata(), TypePrinter, Machine, Context, /*FromValue */ true);
     }
-
-    /* more old metadata stuff
-    if (const MDString MDS = dyn_cast<MDString>(V)) {
-        Out << "!\"";
-        PrintEscapedString(MDS.getString(), Out);
-        Out << '"';
-        return;
-    }
-    */
-    
-    /* these types no longer exist
-    if (GV.getValueID() == Value::PseudoSourceValueVal ||
-        GV.getValueID() == Value::FixedStackPseudoSourceValueVal) {
-        GV.print(Out);
-        return;
-    }
-    */
 
     char Prefix = 'v';
     int Slot;
