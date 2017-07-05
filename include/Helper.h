@@ -105,7 +105,7 @@ namespace llvm {
         static void InitBE(raw_ostream &Out,bool BorE);
 
         static void InitGValue(
-                               raw_ostream &Out,const GlobalVariable *GV,
+                               raw_ostream &Out,const GlobalVariable &GV,
                                TypeGen *TypePrinter,
                                SlotTracker *Machine,
                                const Module *Context);
