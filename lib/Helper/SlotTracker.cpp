@@ -198,22 +198,15 @@ void SlotTracker::CreateFunctionSlot(const Value *V) {
 
 /// CreateModuleSlot - Insert the specified MDNode* into the slot table.
 void SlotTracker::CreateMetadataSlot(const MDNode *N) {
-    assert(N && "Can't insert a null Value into SlotTracker!");
+  assert(N && "Can't insert a null Value into SlotTracker!");
 
-    // Don't insert if N is a function-local metadata, these are always printed
-    // inline.
-    if (!N->isFunctionLocal()) {
-        mdn_iterator I = mdnMap.find(N);
-        if (I != mdnMap.end())
-            return;
+  unsigned DestSlot = mdnNext;
+  if (!mdnMap.insert(std::make_pair(N, DestSlot)).second)
+    return;
+  ++mdnNext;
 
-        unsigned DestSlot = mdnNext++;
-        mdnMap[N] = DestSlot;
-    }
-
-    // Recursively add any MDNodes referenced by operands.
-    for (unsigned i = 0, e = N->getNumOperands(); i != e; ++i)
-        if (const MDNode *Op = dyn_cast_or_null<MDNode>(N->getOperand(i)))
-            CreateMetadataSlot(Op);
+  // Recursively add any MDNodes referenced by operands.
+  for (unsigned i = 0, e = N->getNumOperands(); i != e; ++i)
+    if (const MDNode *Op = dyn_cast_or_null<MDNode>(N->getOperand(i)))
+      CreateMetadataSlot(Op);
 }
-*/
