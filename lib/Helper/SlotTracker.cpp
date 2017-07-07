@@ -1,5 +1,6 @@
 #include "SlotTracker.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/Instructions.h"
 
 // #include "Helper.h"
 // #include "TypeGen.h"
@@ -16,7 +17,6 @@
 // #include "llvm/ADT/APFloat.h"
 // #include "llvm/IR/Constants.h"
 // #include "llvm/IR/Constant.h"
-
 //OLD#include "llvm/Assembly/Writer.h"
 //OLD#include "llvm/Module.h"
 //OLD#include "llvm/IntrinsicInst.h"
@@ -24,7 +24,7 @@
 //OLD#include "llvm/ADT/DenseSet.h"
 
 /* there is also a definition of a slot tracker in AsmWriter.cpp in llvm
-shoudl compare the two...
+should compare the two...
 */
 
 using namespace llvm;
@@ -53,7 +53,6 @@ inline void SlotTracker::initialize() {
         processFunction();
 }
 
-/*
 // Iterate through all the global variables, functions, and global
 // variable initializers and create slots for them.
 void SlotTracker::processModule() {
@@ -62,14 +61,14 @@ void SlotTracker::processModule() {
     for (Module::const_global_iterator I = TheModule->global_begin(),
              E = TheModule->global_end(); I != E; ++I) {
         if (!I->hasName())
-            CreateModuleSlot(I);
+            CreateModuleSlot(&*I);
     }
 
     // Add metadata used by named metadata.
     for (Module::const_named_metadata_iterator
              I = TheModule->named_metadata_begin(),
              E = TheModule->named_metadata_end(); I != E; ++I) {
-        const NamedMDNode *NMD = I;
+        const NamedMDNode *NMD = &*I;
         for (unsigned i = 0, e = NMD->getNumOperands(); i != e; ++i)
             CreateMetadataSlot(NMD->getOperand(i));
     }
@@ -78,7 +77,7 @@ void SlotTracker::processModule() {
     for (Module::const_iterator I = TheModule->begin(), E = TheModule->end();
          I != E; ++I)
         if (!I->hasName())
-            CreateModuleSlot(I);
+            CreateModuleSlot(&*I);
 
 }
 
@@ -99,16 +98,20 @@ void SlotTracker::processFunction() {
     for (Function::const_iterator BB = TheFunction->begin(),
              E = TheFunction->end(); BB != E; ++BB) {
         if (!BB->hasName())
-            CreateFunctionSlot(BB);
+            CreateFunctionSlot(&*BB);
     
         for (BasicBlock::const_iterator I = BB->begin(), E = BB->end(); I != E;
              ++I) {
             if (!I->getType()->isVoidTy() && !I->hasName())
-                CreateFunctionSlot(I);
+                CreateFunctionSlot(&*I);
       
             // Intrinsics can directly use metadata.  We allow direct calls to any
             // llvm.foo function here, because the target may not be linked into the
             // optimizer.
+            // in AsmWriter.cpp there are now also AttributeSlots. that is how
+            // foo funtions are handled now (need to add)
+            // Metadata is no longer a Value type
+            /*
             if (const CallInst *CI = dyn_cast<CallInst>(I)) {
                 if (Function *F = CI->getCalledFunction())
                     if (F->getName().startswith("llvm."))
@@ -116,6 +119,7 @@ void SlotTracker::processFunction() {
                             if (MDNode *N = dyn_cast_or_null<MDNode>(I->getOperand(i)))
                                 CreateMetadataSlot(N);
             }
+            */
 
             // Process metadata attached with this instruction.
             I->getAllMetadata(MDForInst);
@@ -137,11 +141,9 @@ void SlotTracker::purgeFunction() {
     TheFunction = 0;
     FunctionProcessed = false;
 }
-*/
-
 
 /// getGlobalSlot - Get the slot number of a global value.
-inline int SlotTracker::getGlobalSlot(const GlobalValue *V) {
+int SlotTracker::getGlobalSlot(const GlobalValue *V) {
     // Check for uninitialized state and do lazy initialization.
     initialize();
 
@@ -153,7 +155,7 @@ inline int SlotTracker::getGlobalSlot(const GlobalValue *V) {
 
 
 /// getMetadataSlot - Get the slot number of a MDNode.
-inline int SlotTracker::getMetadataSlot(const MDNode *N) {
+int SlotTracker::getMetadataSlot(const MDNode *N) {
     // Check for uninitialized state and do lazy initialization.
     initialize();
 
@@ -165,7 +167,7 @@ inline int SlotTracker::getMetadataSlot(const MDNode *N) {
 
 
 /// getLocalSlot - Get the slot number for a value that is local to a function.
-inline int SlotTracker::getLocalSlot(const Value *V) {
+int SlotTracker::getLocalSlot(const Value *V) {
     assert(!isa<Constant>(V) && "Can't get a constant or global slot with this!");
 
     // Check for uninitialized state and do lazy initialization.
@@ -175,9 +177,8 @@ inline int SlotTracker::getLocalSlot(const Value *V) {
     return FI == fMap.end() ? -1 : (int)FI->second;
 }
 
-
 /// CreateModuleSlot - Insert the specified GlobalValue* into the slot table.
-inline void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
+void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
     assert(V && "Can't insert a null Value into SlotTracker!");
     assert(!V->getType()->isVoidTy() && "Doesn't need a slot!");
     assert(!V->hasName() && "Doesn't need a slot!");
@@ -188,7 +189,7 @@ inline void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
 }
 
 /// CreateSlot - Create a new slot for the specified value if it has no name.
-inline void SlotTracker::CreateFunctionSlot(const Value *V) {
+void SlotTracker::CreateFunctionSlot(const Value *V) {
     assert(!V->getType()->isVoidTy() && !V->hasName() && "Doesn't need a slot!");
 
     unsigned DestSlot = fNext++;
@@ -198,7 +199,7 @@ inline void SlotTracker::CreateFunctionSlot(const Value *V) {
 }
 
 /// CreateModuleSlot - Insert the specified MDNode* into the slot table.
-inline void SlotTracker::CreateMetadataSlot(const MDNode *N) {
+void SlotTracker::CreateMetadataSlot(const MDNode *N) {
   assert(N && "Can't insert a null Value into SlotTracker!");
 
   unsigned DestSlot = mdnNext;
