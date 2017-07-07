@@ -117,28 +117,28 @@ void Helper::PrintLLVMName(raw_ostream &OS, const Value *V) {
 
 */
 
-SlotTracker *Helper::createSlotTracker(const Value *V) {
+NewSlotTracker *Helper::createSlotTracker(const Value *V) {
   if (const Argument *FA = dyn_cast<Argument>(V))
-    return new SlotTracker(FA->getParent());
+    return new NewSlotTracker(FA->getParent());
 
   if (const Instruction *I = dyn_cast<Instruction>(V))
     if (I->getParent())
-      return new SlotTracker(I->getParent()->getParent());
+      return new NewSlotTracker(I->getParent()->getParent());
 
   if (const BasicBlock *BB = dyn_cast<BasicBlock>(V))
-    return new SlotTracker(BB->getParent());
+    return new NewSlotTracker(BB->getParent());
 
   if (const GlobalVariable *GV = dyn_cast<GlobalVariable>(V))
-    return new SlotTracker(GV->getParent());
+    return new NewSlotTracker(GV->getParent());
 
   if (const GlobalAlias *GA = dyn_cast<GlobalAlias>(V))
-    return new SlotTracker(GA->getParent());
+    return new NewSlotTracker(GA->getParent());
 
   if (const GlobalIFunc *GIF = dyn_cast<GlobalIFunc>(V))
-    return new SlotTracker(GIF->getParent());
+    return new NewSlotTracker(GIF->getParent());
 
   if (const Function *Func = dyn_cast<Function>(V))
-    return new SlotTracker(Func);
+    return new NewSlotTracker(Func);
 
   return nullptr;
 }
@@ -197,7 +197,7 @@ const char *Helper::getPredicateText(unsigned predicate) {
 
 void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                                    TypeGen &TypePrinter,
-                                   SlotTracker *Machine,
+                                   NewSlotTracker *Machine,
                                    const Module *Context) {
     if (const ConstantInt *CI = dyn_cast<ConstantInt>(CV)) {
         if (CI->getType()->isIntegerTy(1)) {
@@ -535,7 +535,7 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
 /// the whole instruction that generated it.
 void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
                                     TypeGen *TypePrinter,
-                                    SlotTracker *Machine,
+                                    NewSlotTracker *Machine,
                                     const Module *Context) {
     if (V->hasName()) {
         PrintLLVMName(Out, V);
@@ -599,13 +599,13 @@ void Helper::WriteAsOperandInternal(raw_ostream &Out, const Value *V,
 
 void Helper::WriteAsOperandInternal(raw_ostream &Out, const Metadata *MD,
                                     TypeGen *TypePrinter,
-                                    SlotTracker *Machine,
+                                    NewSlotTracker *Machine,
                                     const Module *Context,
                                     bool FromValue) {
     if (const MDNode *N = dyn_cast<MDNode>(MD)) {
-        std::unique_ptr<SlotTracker> MachineStorage;
+        std::unique_ptr<NewSlotTracker> MachineStorage;
         if (!Machine) {
-            MachineStorage = make_unique<SlotTracker>(Context);
+            MachineStorage = make_unique<NewSlotTracker>(Context);
             Machine = MachineStorage.get();
         }
         int Slot = Machine->getMetadataSlot(N);
@@ -671,7 +671,7 @@ void Helper::InitBE(raw_ostream &Out,bool BorE){
 }
 
 void Helper::InitGValue(raw_ostream &Out,const GlobalVariable *GV,TypeGen *TypePrinter,
-		SlotTracker *Machine,const Module *Context){
+		NewSlotTracker *Machine,const Module *Context){
 
 	const Value *ini=GV->getInitializer();
 	const Constant *CV=dyn_cast<Constant>(ini);

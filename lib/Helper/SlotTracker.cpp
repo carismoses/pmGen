@@ -31,19 +31,19 @@ using namespace llvm;
 
 // Module level constructor. Causes the contents of the Module (sans functions)
 // to be added to the slot table.
-SlotTracker::SlotTracker(const Module *M)
+NewSlotTracker::NewSlotTracker(const Module *M)
     : TheModule(M), TheFunction(0), FunctionProcessed(false), 
       mNext(0), fNext(0),  mdnNext(0) {
 }
 
 // Function level constructor. Causes the contents of the Module and the one
 // function provided to be added to the slot table.
-SlotTracker::SlotTracker(const Function *F)
+NewSlotTracker::NewSlotTracker(const Function *F)
     : TheModule(F ? F->getParent() : 0), TheFunction(F), FunctionProcessed(false),
       mNext(0), fNext(0), mdnNext(0) {
 }
 
-inline void SlotTracker::initialize() {
+inline void NewSlotTracker::initialize() {
     if (TheModule) {
         processModule();
         TheModule = nullptr; ///< Prevent re-processing next time we're called.
@@ -55,7 +55,7 @@ inline void SlotTracker::initialize() {
 
 // Iterate through all the global variables, functions, and global
 // variable initializers and create slots for them.
-void SlotTracker::processModule() {
+void NewSlotTracker::processModule() {
 
     // Add all of the unnamed global variables to the value table.
     for (Module::const_global_iterator I = TheModule->global_begin(),
@@ -82,7 +82,7 @@ void SlotTracker::processModule() {
 }
 
 // Process the arguments, basic blocks, and instructions  of a function.
-void SlotTracker::processFunction() {
+void NewSlotTracker::processFunction() {
     fNext = 0;
 
     // Add all the function arguments with no names.
@@ -136,14 +136,14 @@ void SlotTracker::processFunction() {
 /// Clean up after incorporating a function. This is the only way to get out of
 /// the function incorporation state that affects get*Slot/Create*Slot. Function
 /// incorporation state is indicated by TheFunction != 0.
-void SlotTracker::purgeFunction() {
+void NewSlotTracker::purgeFunction() {
     fMap.clear(); // Simply discard the function level map
     TheFunction = 0;
     FunctionProcessed = false;
 }
 
 /// getGlobalSlot - Get the slot number of a global value.
-int SlotTracker::getGlobalSlot(const GlobalValue *V) {
+int NewSlotTracker::getGlobalSlot(const GlobalValue *V) {
     // Check for uninitialized state and do lazy initialization.
     initialize();
 
@@ -155,7 +155,7 @@ int SlotTracker::getGlobalSlot(const GlobalValue *V) {
 
 
 /// getMetadataSlot - Get the slot number of a MDNode.
-int SlotTracker::getMetadataSlot(const MDNode *N) {
+int NewSlotTracker::getMetadataSlot(const MDNode *N) {
     // Check for uninitialized state and do lazy initialization.
     initialize();
 
@@ -167,7 +167,7 @@ int SlotTracker::getMetadataSlot(const MDNode *N) {
 
 
 /// getLocalSlot - Get the slot number for a value that is local to a function.
-int SlotTracker::getLocalSlot(const Value *V) {
+int NewSlotTracker::getLocalSlot(const Value *V) {
     assert(!isa<Constant>(V) && "Can't get a constant or global slot with this!");
 
     // Check for uninitialized state and do lazy initialization.
@@ -178,7 +178,7 @@ int SlotTracker::getLocalSlot(const Value *V) {
 }
 
 /// CreateModuleSlot - Insert the specified GlobalValue* into the slot table.
-void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
+void NewSlotTracker::CreateModuleSlot(const GlobalValue *V) {
     assert(V && "Can't insert a null Value into SlotTracker!");
     assert(!V->getType()->isVoidTy() && "Doesn't need a slot!");
     assert(!V->hasName() && "Doesn't need a slot!");
@@ -189,7 +189,7 @@ void SlotTracker::CreateModuleSlot(const GlobalValue *V) {
 }
 
 /// CreateSlot - Create a new slot for the specified value if it has no name.
-void SlotTracker::CreateFunctionSlot(const Value *V) {
+void NewSlotTracker::CreateFunctionSlot(const Value *V) {
     assert(!V->getType()->isVoidTy() && !V->hasName() && "Doesn't need a slot!");
 
     unsigned DestSlot = fNext++;
@@ -199,7 +199,7 @@ void SlotTracker::CreateFunctionSlot(const Value *V) {
 }
 
 /// CreateModuleSlot - Insert the specified MDNode* into the slot table.
-void SlotTracker::CreateMetadataSlot(const MDNode *N) {
+void NewSlotTracker::CreateMetadataSlot(const MDNode *N) {
   assert(N && "Can't insert a null Value into SlotTracker!");
 
   unsigned DestSlot = mdnNext;

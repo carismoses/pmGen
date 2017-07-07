@@ -42,7 +42,7 @@ int main (int argc, char ** argv)
 	TypeGen TypeGener;
     
     // just initializes the Module* member of SlotTable
-    SlotTracker SlotTable(m);
+    NewSlotTracker SlotTable(m);
     ConStr conStr;
     std::vector<const Type*> numberedTypes;
 

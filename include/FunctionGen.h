@@ -7,7 +7,7 @@
 namespace llvm {
 
 class TypeGen;
-class SlotTracker;
+class NewSlotTracker;
 class Argument;
 class BasicBlock;
 class Instruction;
@@ -19,7 +19,7 @@ class StringRef;
 
 class FunctionGen {
 	TypeGen &TypeGener;
-	SlotTracker &Machine;
+	NewSlotTracker &Machine;
 	formatted_raw_ostream &Out;
 	const Module *TheModule;
 	std::map<StringRef,int> gos;
@@ -27,7 +27,7 @@ class FunctionGen {
 	int retCount;
 	bool flag;
 public:
-	FunctionGen(TypeGen &TG,SlotTracker &ST,formatted_raw_ostream &OS,const Module *M):TypeGener(TG),Machine(ST),Out(OS),TheModule(M){}
+	FunctionGen(TypeGen &TG,NewSlotTracker &ST,formatted_raw_ostream &OS,const Module *M):TypeGener(TG),Machine(ST),Out(OS),TheModule(M){}
 	~FunctionGen(){}
 	void printFunction(const Function *F);
 	void printArgument(const Argument *Arg,AttributeSet Attrs);

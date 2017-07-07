@@ -24,7 +24,7 @@ namespace llvm {
         NoPrefix
     };
 
-    class SlotTracker;
+    class NewSlotTracker;
     class Value;
     class raw_ostream;
     class TypeGen;
@@ -53,7 +53,7 @@ namespace llvm {
     public:
         static void test(raw_ostream &OS,StringRef Name);
 
-        static SlotTracker *createSlotTracker(const Value *V);
+        static NewSlotTracker *createSlotTracker(const Value *V);
 
         static const Module *getModuleFromVal(const Value *V);
       
@@ -68,7 +68,7 @@ namespace llvm {
         static void WriteAsOperandInternal(
                                            raw_ostream &Out, const Value *V,
                                            TypeGen *TypePrinter,
-                                           SlotTracker *Machine,
+                                           NewSlotTracker *Machine,
                                            const Module *Context);
 
         /// need seperate function for metadata since it is no longer
@@ -76,7 +76,7 @@ namespace llvm {
         static void WriteAsOperandInternal(
                                     raw_ostream &Out, const Metadata *MD,
                                     TypeGen *TypePrinter,
-                                    SlotTracker *Machine,
+                                    NewSlotTracker *Machine,
                                     const Module *Context,
                                     bool FromValue);
             
@@ -87,13 +87,13 @@ namespace llvm {
         static void WriteConstantInternal(
                                           raw_ostream &Out,const Constant *CV,
                                           TypeGen &TypePrinter,
-                                          SlotTracker *Machine,
+                                          NewSlotTracker *Machine,
                                           const Module *Context);
 
         static void WriteMDNodeBodyInternal(
                                             raw_ostream &Out,const MDNode *Node,
                                             TypeGen *TypePrinter,
-                                            SlotTracker *Machine,
+                                            NewSlotTracker *Machine,
                                             const Module *Context);
 
         static void WriteAsOperand(
@@ -107,7 +107,7 @@ namespace llvm {
         static void InitGValue(
                                raw_ostream &Out,const GlobalVariable *GV,
                                TypeGen *TypePrinter,
-                               SlotTracker *Machine,
+                               NewSlotTracker *Machine,
                                const Module *Context);
 	
         static void Formatting(std::string &s);

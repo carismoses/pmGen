@@ -19,7 +19,7 @@ namespace llvm {
 
     /// This class provides computation of slot numbers for LLVM Assembly writing.
     ///
-    class SlotTracker {
+    class NewSlotTracker {
     public:
         /// ValueMap - A mapping of Values to slot numbers.
         typedef DenseMap<const Value*, unsigned> ValueMap;
@@ -45,9 +45,9 @@ namespace llvm {
         unsigned mdnNext;
     public:
         /// Construct from a module
-        explicit SlotTracker(const Module *M);
+        explicit NewSlotTracker(const Module *M);
         /// Construct from a function, starting out in incorp state.
-        explicit SlotTracker(const Function *F);
+        explicit NewSlotTracker(const Function *F);
 
         /// Return the slot number of the specified value in it's type
         /// plane.  If something is not in the SlotTracker, return -1.
@@ -95,8 +95,8 @@ namespace llvm {
         /// Add all of the functions arguments, basic blocks, and instructions.
         void processFunction();
 
-        SlotTracker(const SlotTracker &);  // DO NOT IMPLEMENT
-        void operator=(const SlotTracker &);  // DO NOT IMPLEMENT
+        NewSlotTracker(const NewSlotTracker &);  // DO NOT IMPLEMENT
+        void operator=(const NewSlotTracker &);  // DO NOT IMPLEMENT
     };
 
 }
