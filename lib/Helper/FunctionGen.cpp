@@ -498,6 +498,7 @@ void FunctionGen::printInstruction(const Instruction &I) {
       name2=Operand->getName();
       
       if (name2=="pthread_create"){
+          // previously passed in NULL, but AttributeSet cannot be NULL
           AttributeSet emptyAtt;
           writeParamOperand(CI->getArgOperand(2), emptyAtt);
           Out<<'(';
