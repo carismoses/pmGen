@@ -11,6 +11,7 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/ValueSymbolTable.h"
 #include <unistd.h>
+#include <cstring>
 
 using namespace llvm;
 
@@ -28,6 +29,8 @@ int main (int argc, char ** argv)
         
         // check if the file exists
         if (access(InputFileName.c_str(), F_OK ) == -1) {
+            // should also check that the file is a .bc file... causes SEGFAULTS if not
+            // can also accept .ll
             errs() << "Given file does not exist. \n";
             exit(1);
         }
@@ -77,7 +80,6 @@ int main (int argc, char ** argv)
             // if(const Value *V = dyn_cast<Value>(GI))
             Helper::WriteAsOperandInternal(gvTmp,&*GI,&TypeGener,&SlotTable,GI->getParent());
             gvTmp<<";\n";
-            gvTmp << "\n";
             gvTmp.flush();
             Helper::Formatting(GVTmp);
             if (GI->hasInitializer())
