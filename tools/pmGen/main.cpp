@@ -39,18 +39,24 @@ int main (int argc, char ** argv)
 
     // get Module from input file
     Module* m = parseModule(InputFileName,Context);
-    
 	TypeGen TypeGener;
+    
+    // just initializes the Module* member of SlotTable
     SlotTracker SlotTable(m);
     ConStr conStr;
     std::vector<const Type*> numberedTypes;
+
+    // just initializes TypeGener and numberedTypes members of typeFinder
     TypeFinder typeFinder(TypeGener,numberedTypes);
 
-    // populate TypeGener and numberedTypes with all types from Module
+    // populate typeFinder and numberedTypes with all types from Module
+    // typegen stored TypeNames and numberedTypes stores numbered types
+    // still not sure what the difference is...
     typeFinder.Run(*m);
     formatted_raw_ostream OS(outs());
 
     // print all type names
+    // the getValueSymbolTable() gets the symbol table of all global variables and function identifiers    
     TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
 
     // if there are global variables

@@ -11,7 +11,7 @@ using namespace llvm;
 void TypeFinder::Run(const Module &M) {
     AddModuleTypesToPrinter(&M);
 
-    // Get types from the Value (previously type) symbol table.  This gets opaque types referened
+    // Get types from the value symbol table.  This gets opaque types referened
     // only through derived named types -- not sure if this is still true.
     const ValueSymbolTable &ST = M.getValueSymbolTable();
     for (ValueSymbolTable::const_iterator VI = ST.begin(), E = ST.end();
@@ -19,7 +19,8 @@ void TypeFinder::Run(const Module &M) {
         // IncorporateType(TI->second);
         IncorporateValue(VI->second);
     
-    // Get types from global variables.
+    // Get types from global variables. (aren't all global variable
+    // types in the ValueSymbolTable ??)
     for (Module::const_global_iterator I = M.global_begin(),
              E = M.global_end(); I != E; ++I) {
         IncorporateType(I->getType());
@@ -72,8 +73,6 @@ void TypeFinder::IncorporateType(const Type *Ty) {
         IncorporateType(*I);
 }
 
-// now using this instead of IncorporateType since Module returns a
-// ValueSYmbolTable instead of a TypeSymbolTable 
 void TypeFinder::IncorporateValue(const Value *V) {
     // might need to delete this since no longe rusing IncorporateType()
     // directly from module Type (now Value) SymbolTable
