@@ -111,14 +111,14 @@ void TypeFinder::AddModuleTypesToPrinter(const Module *M) {
         // they are used too often to have a single useful name.
         // Likewise don't insert primitives either.
 
-        // if (const PointerType *PTy = dyn_cast<PointerType>(Ty)) {
-        //     const Type *PETy = PTy->getElementType();
-        //     if ((PETy->isPrimitiveType() || PETy->isIntegerTy()) &&
-        //         !PETy->isOpaqueTy())
-        //         continue;
-        // }
-        // if (Ty->isIntegerTy() || Ty->isPrimitiveType())
-        //     continue;
+        if (const PointerType *PTy = dyn_cast<PointerType>(Ty)) {
+            const Type *PETy = PTy->getElementType();
+            if ((PETy->getPrimitiveSizeInBits() != 0) || PETy->isIntegerTy())
+                // !PETy->isOpaqueTy())   // opaque type is not a subtype of struct
+                continue;
+        }
+        if (Ty->isIntegerTy() || (Ty->getPrimitiveSizeInBits() != 0))
+            continue;
 
         // Get the name as a string and insert it into TypeNames.
         std::string NameStr;
