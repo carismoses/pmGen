@@ -57,16 +57,19 @@ int main (int argc, char ** argv)
     // still not sure what the difference is...
     typeFinder.Run(*m);
     formatted_raw_ostream OS(outs());
+    
+    // print all global variable types and names ?? this is where that struct thing is getting printed out
+    // commented out because it was printing out a struct definition that wasn't part of the .ll 
+    // the getValueSymbolTable() gets the symbol table of all global variables and function identifiers
+    // TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
 
-    // print all type names
-    // the getValueSymbolTable() gets the symbol table of all global variables and function identifiers    
-    TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
+    // if there are global variables make a space before printing functions
+    // if (!m->global_empty()) outs()<<'\n';
 
-    // if there are global variables
-    if (!m->global_empty()) outs()<<'\n';
-
+    // get string for declaring a function (process)
     Helper::InitBE(initProc,true);
 
+    // write out global variables
     for (Module::const_global_iterator GI=m->global_begin(),GE=m->global_end();
          GI!=GE;++GI) {
         // if it has an initializer and is of type ConstantDataSequential.isString(), add it to conStr
@@ -87,12 +90,14 @@ int main (int argc, char ** argv)
             outs()<<GVTmp;
         }
     }
-    
+
+    // write out functions
     FunctionGen functionGener(TypeGener,SlotTable,OS,m);
     for (Module::const_iterator FI=m->begin(),FE=m->end();FI!=FE;++FI){
         functionGener.printFunction(&*FI);
     }
 
+    // write out main function
     Helper::InitBE(initProc,false);
     outs()<<initProc.str();
     return 0;
