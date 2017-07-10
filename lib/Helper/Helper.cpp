@@ -438,54 +438,50 @@ void Helper::WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                 return ;
             }
             if (cast<PointerType>((*OI)->getType())->getElementType()->getTypeID()==Type::StructTyID) isStruct=true;
-
-            if (const Value* OIVal = dyn_cast<Value>(OI)){
-                WriteAsOperandInternal(Out,OIVal,&TypePrinter,Machine,Context);
-            
-                const Type *type=cast<PointerType>((*OI)->getType())->getElementType();
-                OI++;
+            WriteAsOperandInternal(Out, *OI, &TypePrinter, Machine, Context);
+            const Type *type=cast<PointerType>((*OI)->getType())->getElementType();
+            OI++;
+            if (isStruct){
+                if (dyn_cast<ConstantInt>(*OI)->getZExtValue()!=0){
+                    Out <<'[';
+                    WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
+                    Out <<']';
+                }
+            }else{
+                //				Out<<'[';
+                //				WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
+                //				Out<<']';
+            }
+            if (OI==OE) return ;
+            for (++OI;OI!=OE;++OI){
                 if (isStruct){
-                    if (dyn_cast<ConstantInt>(*OI)->getZExtValue()!=0){
-                        Out <<'[';
-                        WriteAsOperandInternal(Out,OIVal,&TypePrinter,Machine,Context);
-                        Out <<']';
-                    }
+                    const StructType *STY=cast<StructType>(type);
+                    unsigned num=dyn_cast<ConstantInt>(*OI)->getZExtValue();
+                    type=STY->getElementType(num);
+                    if (type->getTypeID()!=Type::StructTyID) isStruct=false;
+                    Out<<".u"<<num;				
                 }else{
-                    //				Out<<'[';
-                    //				WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
-                    //				Out<<']';
+                    const ArrayType *ATY = cast<ArrayType>(type);
+                    type=ATY->getElementType();
+                    if (type->getTypeID()==Type::StructTyID) isStruct=true;
+                    Out<<'[';
+                    WriteAsOperandInternal(Out,*OI,&TypePrinter,Machine,Context);
+                    Out<<']';
                 }
-                if (OI==OE) return ;
-                for (++OI;OI!=OE;++OI){
-                    if (isStruct){
-                        const StructType *STY=cast<StructType>(type);
-                        unsigned num=dyn_cast<ConstantInt>(*OI)->getZExtValue();
-                        type=STY->getElementType(num);
-                        if (type->getTypeID()!=Type::StructTyID) isStruct=false;
-                        Out<<".u"<<num;				
-                    }else{
-                        const ArrayType *ATY = cast<ArrayType>(type);
-                        type=ATY->getElementType();
-                        if (type->getTypeID()==Type::StructTyID) isStruct=true;
-                        Out<<'[';
-                        WriteAsOperandInternal(Out,OIVal,&TypePrinter,Machine,Context);
-                        Out<<']';
-                    }
-                }
-                return;
             }
-            else{
-                errs() << "Not able to cast User as Value Type\n";
-            }
+            return;
         }
+        // else{
+        //     errs() << "Not able to cast User as Value Type\n";
+        // }
+        // }
         Out << CE->getOpcodeName();
         Out << " (";
 
         for (User::const_op_iterator OI=CE->op_begin(); OI != CE->op_end(); ++OI) {
             TypePrinter.print((*OI)->getType(), Out);
             Out << ' ';
-            const Value* OIVal = dyn_cast<Value>(OI);
-            WriteAsOperandInternal(Out,OIVal, &TypePrinter, Machine, Context);
+            WriteAsOperandInternal(Out,*OI, &TypePrinter, Machine, Context);
             if (OI+1 != CE->op_end())
                 Out << ", ";
         }
@@ -676,6 +672,7 @@ void Helper::InitGValue(raw_ostream &Out,const GlobalVariable *GV,TypeGen *TypeP
 	const Value *ini=GV->getInitializer();
 	const Constant *CV=dyn_cast<Constant>(ini);
 	std::string name=GV->getName();
+    // global values have an underscore prefix
 	name="_"+name;
 
 	if (const ConstantInt *CI=dyn_cast<ConstantInt>(CV)){
