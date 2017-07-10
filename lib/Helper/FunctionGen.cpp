@@ -150,8 +150,8 @@ void FunctionGen::printFunction(const Function *F) {
     Out << '\n';
   } else {
     Out << " {\n";
-    // Output all of the function's basic blocks.
-	
+    
+    // Output all of the function's variables	
 	for (Function::const_iterator I=F->begin(),E=F->end();I!=E;++I){
 		if (I->hasName()){
 			gos.insert(std::pair<StringRef,int>(I->getName(),count));
@@ -165,8 +165,8 @@ void FunctionGen::printFunction(const Function *F) {
 	
 	Out<<"chan _syn = [0] of { int };\n";
     //TODO map 优化
-//
-//
+
+    // output the functions Labels
 	retCount=0;
 	for (Function::const_iterator I=F->begin(),E=F->end();I!=E;++I){
 		for (BasicBlock::const_iterator BI=I->begin(),BE=I->end();BI!=BE;++BI){
