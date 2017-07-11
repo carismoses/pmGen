@@ -151,7 +151,7 @@ void FunctionGen::printFunction(const Function *F) {
   } else {
     Out << " {\n";
     
-    // Output all of the function's variables	
+    // adding all basic black labels to gos: map<StringRef, int>	
 	for (Function::const_iterator I=F->begin(),E=F->end();I!=E;++I){
 		if (I->hasName()){
 			gos.insert(std::pair<StringRef,int>(I->getName(),count));
@@ -330,13 +330,13 @@ void FunctionGen::printInstruction(const Instruction &I) {
 		}
 	}
 
-	if (isa<PHINode>(I)) {
+	if (const PHINode *PN = dyn_cast<PHINode>(&I)) {
 		Out << "if\n";
 
-		for (unsigned op = 0, Eop = I.getNumOperands(); op < Eop; op += 2) {
+		for (unsigned op = 0, Eop = PN->getNumIncomingValues(); op < Eop; ++op) {
 			Out << "    ::";
 			Out <<"(currentLabel == ";
-			Out<<gos.find(I.getOperand(op+1)->getName())->second<<")->";
+			Out<<gos.find(PN->getIncomingBlock(op)->getName())->second<<")->";
 			Out<<name<<" = ";
 			writeOperand(I.getOperand(op),false);
 			Out<<"\n";
