@@ -61,10 +61,10 @@ int main (int argc, char ** argv)
     // print all global variable types and names ?? this is where that struct thing is getting printed out
     // commented out because it was printing out a struct definition that wasn't part of the .ll 
     // the getValueSymbolTable() gets the symbol table of all global variables and function identifiers
-    // TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
+    TypeGener.gen(numberedTypes,m->getValueSymbolTable(),outs());
 
     // if there are global variables make a space before printing functions
-    // if (!m->global_empty()) outs()<<'\n';
+    if (!m->global_empty()) outs()<<'\n';
 
     // get string for declaring a function (process)
     Helper::InitBE(initProc,true);
