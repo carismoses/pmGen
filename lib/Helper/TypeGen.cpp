@@ -90,6 +90,7 @@ void TypeGen::CalcTypeName(
         case 8:			  OS << "int";  break;
         case 16:		  OS << "int";  break;
         case 32:		  OS << "int";  break;
+        case 64:          OS << "int";  break;
         default:						break;
         }
         break;
@@ -119,32 +120,14 @@ void TypeGen::CalcTypeName(
         OS << "TYPEDEF ";
         CalcTypeName(STy,TypeStack,OS);
         OS << " {";
-        // the element iterator was going past the last element for some reason...
-        // couldn't figure out how
-        /*
-        unsigned i=0;
-        for (StructType::element_iterator I = STy->element_begin(),
-                 E = STy->element_end(); I != E; ++I) {
-            OS << ' ';
-            CalcTypeName(*I, TypeStack, OS);
-            OS << " u"<<i;
-            i++;
-            if (++I == STy->element_end())
-                OS << ' ';
-            else
-                OS << ';';
-        }
-        OS << '}';
-        break;
-        */
         ArrayRef<Type*> const elements = STy->elements();
         for (unsigned i = 0; i < STy->getNumElements(); i++){
             Type* I = elements[i];
-            OS << ' ';
+            if (i != 0)
+                OS << ' ';
             CalcTypeName(I, TypeStack, OS);
             OS << " u"<<i;
-            i++;
-            if (i == STy->getNumElements())
+            if (i == (STy->getNumElements()+1))
                 OS << ' ';
             else
                 OS << ';';
