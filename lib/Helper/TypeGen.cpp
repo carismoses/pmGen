@@ -117,9 +117,12 @@ void TypeGen::CalcTypeName(
     case Type::StructTyID: {
         const StructType *STy = cast<StructType>(Ty);
         OS << "TYPEDEF ";
-        CalcTypeName(Ty,TypeStack,OS);
+        CalcTypeName(STy,TypeStack,OS);
         OS << " {";
-        int i=0;
+        // the element iterator was going past the last element for some reason...
+        // couldn't figure out how
+        /*
+        unsigned i=0;
         for (StructType::element_iterator I = STy->element_begin(),
                  E = STy->element_end(); I != E; ++I) {
             OS << ' ';
@@ -133,6 +136,21 @@ void TypeGen::CalcTypeName(
         }
         OS << '}';
         break;
+        */
+        ArrayRef<Type*> const elements = STy->elements();
+        for (unsigned i = 0; i < STy->getNumElements(); i++){
+            Type* I = elements[i];
+            OS << ' ';
+            CalcTypeName(I, TypeStack, OS);
+            OS << " u"<<i;
+            i++;
+            if (i == STy->getNumElements())
+                OS << ' ';
+            else
+                OS << ';';
+        }
+        OS << '}';
+        break; 
     }
     case Type::PointerTyID: {
         const PointerType *PTy = cast<PointerType>(Ty);
