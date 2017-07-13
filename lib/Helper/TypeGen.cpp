@@ -20,15 +20,15 @@ using namespace llvm;
 static DenseMap<const Type *, std::string> &getTypeNamesMap(void *M) {
 	return *static_cast<DenseMap<const Type *, std::string>*>(M);
 }
-/*
-  void TypeGen::clear() {
-  getTypeNamesMap(TypeNames).clear();
-  }
 
-  bool TypeGen::hasTypeName(const Type *Ty) const {
-  return getTypeNamesMap(TypeNames).count(Ty);
-  }
-*/
+void TypeGen::clear() {
+    getTypeNamesMap(TypeNames).clear();
+}
+
+bool TypeGen::hasTypeName(const Type *Ty) const {
+    return getTypeNamesMap(TypeNames).count(Ty);
+}
+
 void TypeGen::addTypeName(const Type *Ty, const std::string &N) {
   getTypeNamesMap(TypeNames).insert(std::make_pair(Ty, N));
   }
