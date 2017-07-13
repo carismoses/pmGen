@@ -59,12 +59,18 @@ void TypeFinder::IncorporateType(const Type *Ty) {
     if (!VisitedTypes.insert(Ty).second)
         return;
 
-    // If this is a structure or opaque type, add a name for the type
-    // caris: changing to just if structure since now only structs can be opaque
-    if (Ty->isStructTy() && cast<StructType>(Ty)->getNumElements()) {
-        //|| Ty->isOpaqueTy()) && !TP.hasTypeName(Ty)) {
-        TP.addTypeName(Ty, "n_"+utostr(unsigned(NumberedTypes.size())));
-        NumberedTypes.push_back(Ty);
+    // If this is a structure type that we HAVEN'T SEEN YET
+    if (Ty->isStructTy() && !TP.hasTypeName(Ty)) {
+        const StructType* STy = cast<StructType>(Ty);
+        if (STy->getNumElements()){
+            if (STy->hasName()){
+                TP.addTypeName(Ty, STy->getName());
+            }
+            else{
+                TP.addTypeName(Ty, "n_"+utostr(unsigned(NumberedTypes.size())));
+            }
+            NumberedTypes.push_back(Ty);
+        }
     }
 
     // Recursively walk all contained types.
