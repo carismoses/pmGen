@@ -122,6 +122,19 @@ void TypeFinder::AddModuleTypesToPrinter(const Module *M) {
             if ((PETy->getPrimitiveSizeInBits() != 0) || PETy->isIntegerTy())
                 // !PETy->isOpaqueTy())   // opaque type is not a subtype of struct
                 continue;
+
+            // this is a hack...
+            // do not add if the type is a Pointer to a Function with only a variable
+            // number of arguments
+            // this was creating a type whose name was not defined
+            // (maybe could just eliminate any type who has a subtype with a
+            // function type in it?)
+            if (const FunctionType *PEPTy = dyn_cast<FunctionType>(PETy)) {
+                //check for variable number of args
+                if (PEPTy->isVarArg() && (PEPTy->getNumParams() == 0)){
+                    continue;
+                }
+            }
         }
         if (Ty->isIntegerTy() || (Ty->getPrimitiveSizeInBits() != 0))
             continue;
