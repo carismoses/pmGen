@@ -1,3 +1,10 @@
+TYPEDEF union.pthread_attr_t {int u0; int[48] u1;}
+int (int)
+int (int, ...)
+int ()
+int[16]
+int (int, union.pthread_attr_t, year, int)
+
 init {
 chan _syn = [0] of { int };
   run _main(_syn);
@@ -138,15 +145,15 @@ LabelSkip:skip
 
 proctype _main(chan __return) {
 int retval;
- y1;
- y2;
- y3;
+int y1;
+int y2;
+int y3;
 int i;
 int v0;
 int conv;
 bit cmp;
 int v1;
- conv2;
+int conv2;
 int v2;
 int call;
 int v3;

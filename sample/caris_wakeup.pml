@@ -1,3 +1,14 @@
+TYPEDEF union.pthread_attr_t {int u0; int[48] u1;}
+int ()
+int
+int (int)
+int
+int
+int
+int (int, union.pthread_attr_t, server, int)
+int
+int (int)
+
 int _isRunning;
 int _lk;
 int _r_lock;
@@ -244,8 +255,8 @@ LabelSkip:skip
 
 proctype _main(chan __return) {
 int retval;
- p0;
- p1;
+int p0;
+int p1;
 int t;
 int v0;
 int call;

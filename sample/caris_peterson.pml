@@ -1,3 +1,14 @@
+TYPEDEF union.pthread_attr_t {int u0; int[48] u1;}
+int
+int (int)
+int (int)
+int (int, ...)
+int ()
+int[4]
+int
+int[2]
+int (int, union.pthread_attr_t, P0, int)
+
 int _flag[2];
 int _turn;
 int _test;
@@ -29,13 +40,13 @@ chan _syn = [0] of { int };
 Label0:
   currentLabel = 0;
   t_addr = t;
-   _flag[_flag] = 1;
+   _flag[0] = 1;
   _turn = 1;
   goto Label1;
 
 Label1:
   currentLabel = 1;
-  v0 =  _flag[_flag];
+  v0 =  _flag[1];
   cmp = (v0 == 1);
   if
     ::(cmp!= 0) -> goto Label2
@@ -50,7 +61,8 @@ Label2:
 
 Label3:
   if
-    ::(currentLabel == 14468352)->v2 = false
+    ::(currentLabel == 1)->v2 = false
+    ::(currentLabel == 2)->v2 = cmp1
   fi;
   currentLabel = 3;
   if
@@ -72,7 +84,7 @@ Label5:
   v5 = _test;
   dec = v5 + -1;
   _test = dec;
-   _flag[_flag] = 0;
+   _flag[0] = 0;
   v6 = retval;
   __return!v6;
   goto LabelSkip;
@@ -100,13 +112,13 @@ chan _syn = [0] of { int };
 Label0:
   currentLabel = 0;
   t_addr = t;
-   _flag[_flag] = 1;
+   _flag[1] = 1;
   _turn = 0;
   goto Label1;
 
 Label1:
   currentLabel = 1;
-  v0 =  _flag[_flag];
+  v0 =  _flag[0];
   cmp = (v0 == 1);
   if
     ::(cmp!= 0) -> goto Label2
@@ -121,7 +133,8 @@ Label2:
 
 Label3:
   if
-    ::(currentLabel == 14468352)->v2 = false
+    ::(currentLabel == 1)->v2 = false
+    ::(currentLabel == 2)->v2 = cmp1
   fi;
   currentLabel = 3;
   if
@@ -143,7 +156,7 @@ Label5:
   v5 = _test;
   dec = v5 + -1;
   _test = dec;
-   _flag[_flag] = 0;
+   _flag[1] = 0;
   v6 = retval;
   __return!v6;
   goto LabelSkip;
@@ -152,15 +165,15 @@ LabelSkip:skip
 
 proctype _main(chan __return) {
 int retval;
- p0;
- p1;
+int p0;
+int p1;
 int t;
 int v0;
- conv;
+int conv;
 int v1;
 int call;
 int v2;
- conv1;
+int conv1;
 int v3;
 int call2;
 int currentLabel;
