@@ -122,6 +122,11 @@ void TypeGen::CalcTypeName(
     }
     case Type::StructTyID: {
         const StructType *STy = cast<StructType>(Ty);
+        
+        // for now we will not print out any struct types that contain functions or pointers
+        // to functions since promela can't understand it
+        if (invalidStruct(Ty, 0))
+            break;
         OS << "typedef ";
         CalcTypeName(STy,TypeStack,OS);
         OS << " {";
@@ -217,6 +222,7 @@ void TypeGen::gen(std::vector<const Type*> numberedTypes,const ValueSymbolTable 
     //Emit all numbered types.
     for (int NI=0,NE=numberedTypes.size();NI!=NE;++NI){
         type=numberedTypes[NI];
+        // only print types of struct (need to define all custom struct types in PROMELA)
         if (type->isStructTy()){
             this->printAtLeastOneLevel(type,OS);
             OS<<'\n';
@@ -231,3 +237,30 @@ void TypeGen::gen(std::vector<const Type*> numberedTypes,const ValueSymbolTable 
         }
     }
 }
+
+bool TypeGen::invalidStruct(const Type* Ty, int depth) {
+    // this goes into an infinite loop when the structure contains an element
+    // which is a pointer to itself, so cut off after some depth when we
+    // think we are done
+    int maxDepth = 10;
+    // base cases
+    if (depth == maxDepth)
+        return false;
+    else if (Ty->isFunctionTy())
+        return true;
+
+    // recursive cases
+    else if(const StructType* STy = dyn_cast<StructType>(Ty)){   
+        ArrayRef<Type*> const elements = STy->elements();
+        for (unsigned i = 0; i < STy->getNumElements(); i++)
+            return invalidStruct(elements[i], depth+1);
+    }
+    else if (const PointerType* PTy = dyn_cast<PointerType>(Ty))
+        return invalidStruct(PTy->getElementType(), depth+1);
+    
+    // another base case
+    else
+        return false;
+    
+}
+
