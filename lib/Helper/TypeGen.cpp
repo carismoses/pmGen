@@ -117,7 +117,7 @@ void TypeGen::CalcTypeName(
     }
     case Type::StructTyID: {
         const StructType *STy = cast<StructType>(Ty);
-        OS << "TYPEDEF ";
+        OS << "typedef ";
         CalcTypeName(STy,TypeStack,OS);
         OS << " {";
         ArrayRef<Type*> const elements = STy->elements();
@@ -212,13 +212,17 @@ void TypeGen::gen(std::vector<const Type*> numberedTypes,const ValueSymbolTable 
     //Emit all numbered types.
     for (int NI=0,NE=numberedTypes.size();NI!=NE;++NI){
         type=numberedTypes[NI];
-        this->printAtLeastOneLevel(type,OS);
-        OS<<'\n';
+        if (type->isStructTy()){
+            this->printAtLeastOneLevel(type,OS);
+            OS<<'\n';
+        }
     }
 
     //Print the named types.
     for (ValueSymbolTable::const_iterator VI=ST.begin(),VE=ST.end();VI!=VE;++VI){
-        this->printAtLeastOneLevel(VI->second->getType(),OS);
-     	OS<<'\n';
+        if (VI->second->getType()->isStructTy()){
+            this->printAtLeastOneLevel(VI->second->getType(),OS);
+            OS<<'\n';
+        }
     }
 }
