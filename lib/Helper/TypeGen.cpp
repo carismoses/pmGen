@@ -29,9 +29,14 @@ bool TypeGen::hasTypeName(const Type *Ty) const {
     return getTypeNamesMap(TypeNames).count(Ty);
 }
 
-void TypeGen::addTypeName(const Type *Ty, const std::string &N) {
-  getTypeNamesMap(TypeNames).insert(std::make_pair(Ty, N));
-  }
+void TypeGen::addTypeName(const Type *Ty, const std::string &Name) {
+    std::string cpName = Name;
+    for (unsigned i = 0; i < cpName.size(); ++i){
+        if ((cpName[i] == ':') || (cpName[i] == '.'))
+            cpName[i] = '_';
+    }
+    getTypeNamesMap(TypeNames).insert(std::make_pair(Ty, cpName));
+}
 
 TypeGen::TypeGen() {
 	TypeNames = new DenseMap<const Type *, std::string>();
