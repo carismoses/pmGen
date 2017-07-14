@@ -135,12 +135,21 @@ void TypeGen::CalcTypeName(
             Type* I = elements[i];
             if (i != 0)
                 OS << ' ';
-            CalcTypeName(I, TypeStack, OS);
-            OS << " u"<<i;
-            if (i == (STy->getNumElements()+1))
-                OS << ' ';
-            else
-                OS << ';';
+            // if the element type is an array, then just handle printing it here, don't recurse
+            // back into CalcTypeNames()
+            if (const ArrayType* ATy = dyn_cast<ArrayType>(I)){                
+                CalcTypeName(ATy->getElementType(),TypeStack,OS);
+                OS << " u"<<i;
+                OS << '[' << ATy->getNumElements() << ']';
+            }
+            else{
+                CalcTypeName(I, TypeStack, OS);
+                OS << " u"<<i;
+                if (i == (STy->getNumElements()+1))
+                    OS << ' ';
+                else
+                    OS << ';';
+            }
         }
         OS << '}';
         break; 
